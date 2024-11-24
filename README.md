@@ -10,7 +10,7 @@ The system prompt of an LLM allows you to define the context of the agent's role
 
 - Error Analysis
 - Source of Error
-- Suggestions to Fix
+- Suggestion to Fix
 
 ### Supported Logs
 
