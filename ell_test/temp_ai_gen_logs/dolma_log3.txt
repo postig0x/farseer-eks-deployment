@@ -1,0 +1,19 @@
+2024-11-22T12:00:01Z INFO: Starting Docker container with ID 4f3b9a2d5c6e...
+2024-11-22T12:00:01Z DEBUG: Executing command: ["/bin/sh", "-c", "/app/initialize.sh"]
+
+2024-11-22T12:00:02Z INFO: Verifying configuration file: /etc/myapp/config.yaml
+2024-11-22T12:00:03Z ERROR: Configuration file not found: /etc/myapp/config.yaml
+2024-11-22T12:00:04Z WARN: Falling back to default configuration.
+
+2024-11-22T12:00:05Z DEBUG: Attempting to generate default configuration...
+2024-11-22T12:00:10Z ERROR: Failed to write default configuration: Permission denied.
+
+2024-11-22T12:00:15Z INFO: Application startup terminated due to configuration issues.
+2024-11-22T12:00:18Z DEBUG: Container logs:
+[INFO] Checking system readiness...
+[ERROR] Failed to load configuration. Ensure /etc/myapp/config.yaml exists.
+
+2024-11-22T12:00:20Z ERROR: Container exited with code 2.
+2024-11-22T12:00:22Z INFO: Cleaning up container ID 4f3b9a2d5c6e...
+
+

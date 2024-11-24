@@ -1,0 +1,68 @@
+2024-11-22T12:00:00Z INFO: Starting Docker container with ID a8b9c0d1e2f3...
+2024-11-22T12:00:01Z DEBUG: Entrypoint executed: ["/bin/bash", "/app/entrypoint.sh"]
+
+2024-11-22T12:00:02Z INFO: Pulling image: web_service:1.0.0
+2024-11-22T12:00:03Z DEBUG: Image pull progress: 10%
+2024-11-22T12:00:05Z DEBUG: Image pull progress: 40%
+2024-11-22T12:00:07Z DEBUG: Image pull progress: 80%
+2024-11-22T12:00:09Z DEBUG: Image pull progress: 100%
+2024-11-22T12:00:10Z INFO: Image web_service:1.0.0 pulled successfully.
+
+2024-11-22T12:00:11Z INFO: Verifying environment variables...
+2024-11-22T12:00:12Z DEBUG: ENV VAR: APP_ENV=production
+2024-11-22T12:00:13Z DEBUG: ENV VAR: DATABASE_URL=postgres://db_user:db_pass@db_host:5432/app_db
+2024-11-22T12:00:14Z INFO: All required environment variables are set.
+
+2024-11-22T12:00:15Z INFO: Checking application configuration...
+2024-11-22T12:00:16Z INFO: Loading configuration from /app/config/config.json
+2024-11-22T12:00:17Z DEBUG: Configuration loaded: {"port": 8080, "logLevel": "DEBUG"}
+2024-11-22T12:00:18Z INFO: Configuration check passed.
+
+2024-11-22T12:00:20Z INFO: Starting application server...
+2024-11-22T12:00:21Z DEBUG: Executing command: ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+2024-11-22T12:00:22Z INFO: Server started. Listening on port 8080.
+
+2024-11-22T12:00:23Z INFO: Processing incoming requests...
+
+2024-11-22T12:00:30Z DEBUG: [GET] Request received at /api/status
+2024-11-22T12:00:31Z INFO: [GET] 200 OK - Response: {"status": "healthy"}
+2024-11-22T12:00:33Z DEBUG: [GET] Request received at /api/users
+2024-11-22T12:00:34Z ERROR: [GET] 500 Internal Server Error - Failed to fetch users.
+Traceback (most recent call last):
+  File "/app/api.py", line 45, in get_users
+    users = db.query_all_users()
+  File "/app/db.py", line 12, in query_all_users
+    raise DatabaseConnectionError("Failed to connect to the database.")
+DatabaseConnectionError: Failed to connect to the database.
+
+2024-11-22T12:00:35Z WARN: Database error occurred. Retrying...
+2024-11-22T12:00:36Z INFO: Retrying request to database...
+2024-11-22T12:00:38Z ERROR: Retry failed: Database still unavailable.
+
+2024-11-22T12:00:40Z DEBUG: [POST] Request received at /api/login
+2024-11-22T12:00:41Z INFO: Validating user credentials...
+2024-11-22T12:00:42Z ERROR: [POST] 401 Unauthorized - Invalid credentials for user admin.
+Traceback (most recent call last):
+  File "/app/auth.py", line 27, in login
+    raise UnauthorizedError("Invalid username or password.")
+UnauthorizedError: Invalid username or password.
+
+2024-11-22T12:00:50Z DEBUG: [GET] Request received at /api/products
+2024-11-22T12:00:52Z INFO: Fetching product list from database...
+2024-11-22T12:00:54Z ERROR: [GET] 503 Service Unavailable - Failed to retrieve product list.
+Traceback (most recent call last):
+  File "/app/products.py", line 34, in get_products
+    response = requests.get(database_api_url, timeout=5)
+  File "/usr/local/lib/python3.9/site-packages/requests/api.py", line 75, in get
+    return request('get', url, params=params, **kwargs)
+  File "/usr/local/lib/python3.9/site-packages/requests/api.py", line 61, in request
+    raise Timeout("The request timed out.")
+requests.exceptions.Timeout: The request timed out.
+
+2024-11-22T12:01:00Z INFO: Shutting down application due to repeated errors.
+2024-11-22T12:01:01Z DEBUG: Cleanup started...
+2024-11-22T12:01:02Z INFO: Stopping server gracefully.
+2024-11-22T12:01:04Z DEBUG: Removing temporary files...
+2024-11-22T12:01:06Z INFO: Cleanup complete. Docker container terminated.
+
+

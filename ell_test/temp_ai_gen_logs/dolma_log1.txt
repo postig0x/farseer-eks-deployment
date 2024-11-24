@@ -1,0 +1,84 @@
+2024-11-22T10:00:01Z INFO: Starting Docker container with ID 4f7a8b3c2d6e...
+2024-11-22T10:00:02Z DEBUG: Executing command: ["/bin/sh", "-c", "/app/start.sh"]
+
+2024-11-22T10:00:03Z INFO: Pulling image: web_app_image:latest
+2024-11-22T10:00:04Z DEBUG: Image pull progress: 5%
+2024-11-22T10:00:06Z DEBUG: Image pull progress: 15%
+2024-11-22T10:00:08Z DEBUG: Image pull progress: 35%
+2024-11-22T10:00:10Z DEBUG: Image pull progress: 60%
+2024-11-22T10:00:12Z DEBUG: Image pull progress: 85%
+2024-11-22T10:00:14Z DEBUG: Image pull progress: 100%
+2024-11-22T10:00:15Z INFO: Image web_app_image:latest pulled successfully.
+
+2024-11-22T10:00:16Z INFO: Checking for configuration files...
+2024-11-22T10:00:17Z ERROR: Missing configuration file: /etc/app/config.yaml
+2024-11-22T10:00:18Z WARN: Attempting to use default configuration.
+
+2024-11-22T10:00:19Z INFO: Verifying environment variables...
+2024-11-22T10:00:20Z DEBUG: DATABASE_URL is set to postgres://db_user@localhost:5432/app_db
+2024-11-22T10:00:21Z ERROR: Missing required variable: API_KEY
+2024-11-22T10:00:22Z WARN: Defaulting API_KEY to a placeholder value for testing.
+
+2024-11-22T10:00:23Z DEBUG: Initializing application dependencies...
+2024-11-22T10:00:24Z INFO: Dependency check started.
+2024-11-22T10:00:25Z ERROR: Missing dependency: libssl.so.1.1
+2024-11-22T10:00:26Z INFO: Attempting to install missing dependency via apt-get.
+
+2024-11-22T10:00:27Z DEBUG: Running apt-get update...
+2024-11-22T10:00:30Z DEBUG: apt-get update completed.
+2024-11-22T10:00:31Z INFO: Installing libssl1.1 package...
+2024-11-22T10:00:33Z ERROR: Failed to acquire dpkg lock. Another process is using the package manager.
+2024-11-22T10:00:34Z WARN: Retrying in 5 seconds...
+
+2024-11-22T10:00:39Z INFO: Retrying installation of libssl1.1...
+2024-11-22T10:00:41Z INFO: Dependency libssl1.1 installed successfully.
+
+2024-11-22T10:00:42Z INFO: Starting the application...
+2024-11-22T10:00:43Z DEBUG: Executing application command: ["/usr/local/bin/python", "app.py"]
+
+2024-11-22T10:00:45Z INFO: Application started. Monitoring logs...
+2024-11-22T10:00:47Z DEBUG: Checking HTTP endpoint: http://localhost:8000/health
+2024-11-22T10:00:48Z ERROR: Health check failed. Service not available on port 8000.
+
+2024-11-22T10:00:50Z WARN: Retrying health check in 10 seconds...
+2024-11-22T10:01:00Z ERROR: Health check failed. Service not available on port 8000.
+
+2024-11-22T10:01:10Z DEBUG: Logging error details...
+Traceback (most recent call last):
+  File "/app/start.py", line 34, in <module>
+    raise RuntimeError("Health check failed!")
+RuntimeError: Health check failed!
+
+2024-11-22T10:01:15Z ERROR: Application crashed with exception.
+2024-11-22T10:01:16Z INFO: Stopping Docker container due to repeated errors.
+2024-11-22T10:01:17Z DEBUG: Removing container logs...
+2024-11-22T10:01:20Z INFO: Container cleanup completed.
+
+...
+
+<This format repeats with debug information, retry attempts, application logs, and failures for 500 lines, including dependencies, runtime issues, and environment variable checks. Example segments:>
+
+...
+
+2024-11-22T10:02:30Z WARN: Network interface eth0 not found. Using fallback interface lo0.
+2024-11-22T10:02:45Z ERROR: SSL handshake failed. Verify SSL certificates.
+2024-11-22T10:03:10Z INFO: Retrying API connection...
+2024-11-22T10:03:50Z ERROR: Timeout while connecting to API service.
+2024-11-22T10:04:00Z DEBUG: Traceback details:
+Traceback (most recent call last):
+  File "/app/main.py", line 55, in connect_to_api
+    response = requests.get(api_url, timeout=5)
+requests.exceptions.Timeout: Request timed out.
+
+...
+
+2024-11-22T10:10:30Z ERROR: Unhandled exception in application startup:
+Traceback (most recent call last):
+  File "/usr/local/app/app.py", line 112, in main
+    start_services()
+RuntimeError: Unable to start service due to missing configuration.
+
+...
+
+2024-11-22T10:15:00Z INFO: Docker container terminated with errors.
+

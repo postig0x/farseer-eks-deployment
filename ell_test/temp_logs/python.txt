@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/kpostigo/dev/kura/final/farseer/main.py", line 102, in <module>
+    def classify_log_entry(log_entry: str) -> Enum[LogEntryClassification]:
+                                              ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.0_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/enum.py", line 782, in __getitem__
+    return cls._member_map_[name]
+           ~~~~~~~~~~~~~~~~^^^^^^
+KeyError: <class '__main__.LogEntryClassification'>
