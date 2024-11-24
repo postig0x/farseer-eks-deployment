@@ -1,0 +1,34 @@
+2024-11-22T10:00:01Z INFO: Starting Docker container with ID 3f7b9b2c1a4a...
+2024-11-22T10:00:01Z DEBUG: Executing command: ["/bin/sh", "-c", "/app/start.sh"]
+
+2024-11-22T10:00:02Z INFO: Pulling required image: my_app_image:latest
+2024-11-22T10:00:05Z DEBUG: Image pull progress: 25%
+2024-11-22T10:00:07Z DEBUG: Image pull progress: 50%
+2024-11-22T10:00:10Z DEBUG: Image pull progress: 75%
+2024-11-22T10:00:12Z DEBUG: Image pull progress: 100%
+2024-11-22T10:00:12Z INFO: Image pulled successfully.
+
+2024-11-22T10:00:15Z ERROR: Failed to bind to port 5000. Address already in use.
+2024-11-22T10:00:15Z WARN: Retrying with a new port...
+
+2024-11-22T10:00:18Z INFO: Binding to port 5001...
+2024-11-22T10:00:20Z DEBUG: Checking application dependencies...
+2024-11-22T10:00:21Z ERROR: Missing dependency: libssl.so.1.1
+2024-11-22T10:00:22Z ERROR: Application startup failed due to missing libraries.
+2024-11-22T10:00:22Z INFO: Attempting to install missing dependencies...
+
+2024-11-22T10:00:30Z INFO: Installing libssl via apt-get.
+2024-11-22T10:00:33Z WARN: Failed to acquire lock for apt-get: Another process is using the package manager.
+2024-11-22T10:00:35Z ERROR: Dependency installation failed. Exiting.
+
+2024-11-22T10:00:40Z DEBUG: Container logs:
+[ERROR] 2024-11-22 10:00:15: Failed to open /etc/config/settings.json: File not found.
+[INFO] 2024-11-22 10:00:16: Default settings will be applied.
+[ERROR] 2024-11-22 10:00:22: Unable to establish a database connection. Check DATABASE_URL environment variable.
+
+2024-11-22T10:00:45Z ERROR: Container exited with code 1.
+2024-11-22T10:00:45Z INFO: Cleaning up resources...
+2024-11-22T10:00:47Z DEBUG: Removing container 3f7b9b2c1a4a...
+2024-11-22T10:00:50Z INFO: Cleanup complete. Docker container terminated.
+
+

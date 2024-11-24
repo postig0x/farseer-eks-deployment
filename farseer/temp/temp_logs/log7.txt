@@ -1,0 +1,27 @@
+2024-11-22T11:00:01Z INFO: Starting Docker container with ID 5a8c9d2e4b6f...
+2024-11-22T11:00:01Z DEBUG: Executing command: ["/bin/sh", "-c", "/app/start.sh"]
+
+2024-11-22T11:00:02Z INFO: Pulling required image: my_app_image:v1.2
+2024-11-22T11:00:05Z DEBUG: Image pull progress: 10%
+2024-11-22T11:00:08Z DEBUG: Image pull progress: 90%
+2024-11-22T11:00:10Z INFO: Image pulled successfully.
+
+2024-11-22T11:00:15Z ERROR: Failed to bind to port 8080. Address already in use.
+2024-11-22T11:00:15Z WARN: Retrying with port 8081...
+
+2024-11-22T11:00:20Z INFO: Binding to port 8081...
+2024-11-22T11:00:23Z DEBUG: Checking application dependencies...
+2024-11-22T11:00:25Z ERROR: Missing dependency: libcrypto.so.1.1
+2024-11-22T11:00:27Z INFO: Attempting to install libcrypto...
+
+2024-11-22T11:00:30Z WARN: Failed to access package manager. Insufficient permissions.
+2024-11-22T11:00:35Z ERROR: Application startup failed. Missing critical dependency.
+
+2024-11-22T11:00:40Z DEBUG: Container logs:
+[INFO] Starting app services...
+[ERROR] Dependency check failed: libcrypto.so.1.1 missing.
+
+2024-11-22T11:00:45Z ERROR: Container exited with code 127.
+2024-11-22T11:00:47Z INFO: Cleaning up container resources...
+
+

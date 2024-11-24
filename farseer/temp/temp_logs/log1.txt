@@ -1,0 +1,9 @@
+2024-11-22T10:02:30Z WARN: Network interface eth0 not found. Using fallback interface lo0.
+2024-11-22T10:02:45Z ERROR: SSL handshake failed. Verify SSL certificates.
+2024-11-22T10:03:10Z INFO: Retrying API connection...
+2024-11-22T10:03:50Z ERROR: Timeout while connecting to API service.
+2024-11-22T10:04:00Z DEBUG: Traceback details:
+Traceback (most recent call last):
+  File "/app/main.py", line 55, in connect_to_api
+    response = requests.get(api_url, timeout=5)
+requests.exceptions.Timeout: Request timed out.

@@ -1,0 +1,5 @@
+2024-11-22T10:10:30Z ERROR: Unhandled exception in application startup:
+Traceback (most recent call last):
+  File "/usr/local/app/app.py", line 112, in main
+    start_services()
+RuntimeError: Unable to start service due to missing configuration.

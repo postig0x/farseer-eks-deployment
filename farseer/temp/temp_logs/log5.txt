@@ -1,0 +1,20 @@
+2024-11-22T14:00:01Z INFO: Starting Docker container with ID 9f7b3c2d4a6e...
+2024-11-22T14:00:01Z DEBUG: Executing command: ["/bin/sh", "-c", "/app/run.sh"]
+
+2024-11-22T14:00:03Z INFO: Initializing application...
+2024-11-22T14:00:05Z ERROR: Application crashed due to unhandled exception.
+2024-11-22T14:00:05Z DEBUG: Error details:
+Traceback (most recent call last):
+  File "/app/main.py", line 24, in <module>
+    result = 1 / 0
+ZeroDivisionError: division by zero
+
+2024-11-22T14:00:08Z INFO: Logging error for diagnostics...
+2024-11-22T14:00:10Z DEBUG: Application log:
+[INFO] App starting...
+[ERROR] Fatal error: division by zero.
+
+2024-11-22T14:00:12Z ERROR: Container exited with code 1.
+2024-11-22T14:00:15Z INFO: Cleaning up container resources...
+
+
