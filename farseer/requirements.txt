@@ -1,4 +1,3 @@
 python-dotenv
-pydantic
-instructor
 openai
+ell-ai[all]
