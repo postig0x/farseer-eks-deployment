@@ -12,7 +12,7 @@ The system prompt of an LLM allows you to define the context of the agent's role
 - Source of Error
 - Suggestion to Fix
 
-#### Supported Logs
+### Supported Logs
 
 - Web Server
 - System
@@ -23,6 +23,7 @@ The system prompt of an LLM allows you to define the context of the agent's role
 ## Optimization
 
 ### Backend Application
+
 The app can be structured better to support expanding capabilities for the agent. An example of this is by moving the LLM API calls to a separate module, in case other APIs are introduced.
 
 The app can use a model that performs better against prompt injections.
