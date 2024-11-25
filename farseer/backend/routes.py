@@ -45,7 +45,6 @@ class LogRequest(BaseModel):
 async def generateLogResponse(log_request: LogRequest):
     """Endpoint to generate response from logs"""
     log = log_request.log
-    print(log)
     if not log:
         raise HTTPException(status_code=400, detail="A valid log is required.")
     log_response = explain_log(log)
