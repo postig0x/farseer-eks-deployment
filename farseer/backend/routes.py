@@ -50,3 +50,7 @@ async def generateLogResponse(log_request: LogRequest):
     log_response = explain_log(log)
     return {'output': log_response}
 
+@api_router.get('/health')
+async def healthCheck():
+    """Endpoint for healthcheck"""
+    return {'status': 'ok'}

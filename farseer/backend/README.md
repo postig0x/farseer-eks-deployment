@@ -32,4 +32,3 @@ fastapi run
 # for dev mode (hot reload)
 fastapi dev main.py
 ```
-
