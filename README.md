@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Farseer
 
-## Getting Started
+Building and Deploying a Highly Available Agentic System with Log-Reading Capabilities
 
-First, run the development server:
+## Purpose
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Prompt Engineering
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The system prompt of an LLM allows you to define the context of the agent's role. For this project, we selected a basic response structure to streamline the user experience. The full system prompt is in `/farseer/backend/routes.py`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Error Analysis
+- Source of Error
+- Suggestion to Fix
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### Supported Logs
 
-## Learn More
+- Web Server
+- System
+- Application
+- Docker Containers
+- Event
 
-To learn more about Next.js, take a look at the following resources:
+## Optimization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend Application
+The app can be structured better to support expanding capabilities for the agent. An example of this is by moving the LLM API calls to a separate module, in case other APIs are introduced.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The app can use a model that performs better against prompt injections.
