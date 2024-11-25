@@ -15,7 +15,7 @@ xai_client = OpenAI(
     base_url="https://api.x.ai/v1"
 )
 
-ell.init(autocommit=False)
+# ell.init(autocommit=False)
 ell.config.register_model("grok-beta", xai_client)
 
 @ell.simple(model="grok-beta", temperature=0.7)
