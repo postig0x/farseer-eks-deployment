@@ -1,6 +1,6 @@
 # Farseer Frontend
 
-This app uses React Next.js, shadcn, and tailwindcss.
+This app uses React Next.js, shadcn, and tailwindcss. Uses port 3000.
 
 ## Setup
 

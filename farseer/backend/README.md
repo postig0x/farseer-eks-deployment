@@ -1,6 +1,6 @@
 # Farseer Backend
 
-The backend uses the FastAPI framework along with `uvicorn` to serve the app that connects to the LLM API.
+The backend uses the FastAPI framework along with `uvicorn` to serve the app that connects to the LLM API. Uses port 8000.
 
 ## Setup
 
