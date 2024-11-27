@@ -30,15 +30,15 @@ export default function DevOpsErrorAnalyzer() {
   return (
     <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-8 text-foreground">DevOps Error Analyzer: Docker Log Debugger</h1>
+        <h1 className="text-2xl font-bold text-center mb-8 text-foreground">DevOps Error Analyzer: Log Debugger</h1>
         <div className="space-y-6">
           <div>
             <label htmlFor="logs" className="block text-sm font-medium text-foreground mb-2">
-              Paste your Docker error logs here:
+              Paste your error logs here:
             </label>
             <Textarea
               id="logs"
-              placeholder="Enter your Docker logs..."
+              placeholder="Enter your logs..."
               value={logs}
               onChange={(e) => setLogs(e.target.value)}
               rows={10}
