@@ -131,7 +131,7 @@ resource "aws_instance" "farseer-frontend" {
   ami                    = "ami-0866a3c8686eaeeba"
   instance_type          = var.instance_type
   subnet_id              = var.private_subnet_id[count.index]
-  vpc_security_group_ids = [aws_security_group.frontend_sg_az1]
+  vpc_security_group_ids = [aws_security_group.frontend_sg]
   key_name               = "bastionHost-keypair"
 
   tags = {
