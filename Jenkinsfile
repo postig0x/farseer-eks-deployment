@@ -7,6 +7,7 @@ pipeline {
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     API_KEY = credentials('API_KEY')
+    SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
     stages {
@@ -14,29 +15,34 @@ pipeline {
             steps {
                 script {
                     // For Linux/Mac
-                    sh './Scripts/frontend.sh'
-                    sh './Scripts/backend.sh'
+                    sh './CICD_Scripts/frontend.sh'
+                    sh './CICD_Scripts/backend.sh'
 
                 }
             }
         }
     }
 
-    stage('Test') {
-      agent any
-      steps {
-        dir('backend') {
-            sh '''#!/bin/bash
-            python3.9 -m venv venv
-            source venv/bin/activate
-            pip install -r requirements.txt
-            pip install pytest-django
-          ''' 
-
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
+                    sh """
+                    ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=your_project_key \
+                        -Dsonar.sources=src \
+                        -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
+                        -Dsonar.login=your_sonar_token
+                    """
+                }
+            }
         }
-
-      }
-    }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
     stage('Cleanup') {
       agent { label 'build-node' }
@@ -55,14 +61,14 @@ pipeline {
         
         // Build and push backend
         sh '''
-          docker build -t ${DOCKER_CREDS_USR}/ecommercebackend:latest -f Dockerfile.backend .
-          docker push ${DOCKER_CREDS_USR}/ecommercebackend:latest
+          docker build -t ${DOCKER_CREDS_USR}/<name>:latest -f Dockerfile.backend .
+          docker push ${DOCKER_CREDS_USR}/<name>:latest
         '''
         
         // Build and push frontend
         sh '''
-          docker build -t ${DOCKER_CREDS_USR}/ecommercefrontend:latest -f Dockerfile.frontend .
-          docker push ${DOCKER_CREDS_USR}/ecommercefrontend:latest
+          docker build -t ${DOCKER_CREDS_USR}/<name>:latest -f Dockerfile.frontend .
+          docker push ${DOCKER_CREDS_USR}/<name>:latest
         '''
       }
     }
