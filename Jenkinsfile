@@ -95,7 +95,7 @@ stage('Deploy') {
                 }
             } else if (env.BRANCH_NAME == 'qa') {
                 echo "Deploying to Testing Environment"
-                dir('terraform/qa') { // Navigate to the staging environment directory
+                dir('terraform/qa') { // Navigate to the qa environment directory
                     sh '''
                       echo "Current working directory:"
                       pwd
