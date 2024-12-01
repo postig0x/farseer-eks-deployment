@@ -92,23 +92,44 @@ pipeline {
     }
 
 
-    stage('Deploy') {
-        steps {
-            script {
-                if (env.BRANCH_NAME == 'main') {
-                    echo "Deploying to Production Environment"
-                    // Add production deployment steps
-                } else if (env.BRANCH_NAME == 'develop') {
-                    echo "Deploying to Staging Environment"
-                    // Add staging deployment steps
-                } else if (env.BRANCH_NAME.startsWith('feature/')) {
-                    echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                } else {
-                    error("Unknown branch: ${env.BRANCH_NAME}")
+stage('Deploy') {
+    steps {
+        script {
+            if (env.BRANCH_NAME == 'main') {
+                echo "Deploying to Production Environment"
+                dir('terraform/production') { // Navigate to the production environment directory
+                    sh '''
+                      echo "Current working directory:"
+                      pwd
+                      terraform init
+                      terraform apply -auto-approve \
+                        -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                        -var="dockerhub_password=${DOCKER_CREDS_PSW}"
+
+          '''
                 }
+            } else if (env.BRANCH_NAME == 'develop') {
+                echo "Deploying to Staging Environment"
+                dir('terraform/staging') { // Navigate to the staging environment directory
+                    sh '''
+                      echo "Current working directory:"
+                      pwd
+                      terraform init
+                      terraform apply -auto-approve \
+                        -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                        -var="dockerhub_password=${DOCKER_CREDS_PSW}"
+
+          '''
+                }
+            } else if (env.BRANCH_NAME.startsWith('feature/')) {
+                echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+            } else {
+                error("Unknown branch: ${env.BRANCH_NAME}")
             }
         }
     }
+}
+
   
 
     // Add a Cleanup Stage Here
