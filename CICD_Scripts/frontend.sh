@@ -3,7 +3,7 @@
 # sudo apt install -y nodejs
 echo "Current directory: $(pwd)"
 
-cd /../farseer/frontend
+cd ./farseer/frontend
 node -v
 npm i
 npm run build

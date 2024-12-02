@@ -4,9 +4,10 @@
 # sudo apt install software-properties-common
 # sudo apt install python3.12
 # sudo apt install python3.12-venv -y
+echo "Current directory: $(pwd)"
 python3 -m venv venv
 
-cd farseer/farseer/backend
+cd ./farseer/backend
 source venv/bin/activate
 pip install -r requirements.txt
 
