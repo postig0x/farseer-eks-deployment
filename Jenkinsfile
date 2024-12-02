@@ -44,6 +44,7 @@ pipeline {
             }
         }
 
+
 //       stage('Cleanup') {
 //         agent { label 'build-node' }
 //         steps {
@@ -140,7 +141,7 @@ pipeline {
 //         '''
 //       }
 //     }
-//     }
+    }
 
     // stage('Destroy') {
     //   agent { label 'build-node' }
