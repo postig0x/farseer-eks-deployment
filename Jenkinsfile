@@ -13,12 +13,14 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+              withCredentials([string(credentialsId: 'xai-key', variable: 'XAI_KEY')]) {
                 script {
                     // For Linux/Mac
                     sh './CICD_Scripts/frontend.sh'
                     sh './CICD_Scripts/backend.sh'
 
                 }
+            }
             }
         }
     
