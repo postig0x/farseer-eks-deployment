@@ -24,6 +24,7 @@ pipeline {
     }
 
         stage('SonarQube Analysis') {
+          agent { label 'build-node' }
             steps {
                 withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
                     sh """
@@ -37,6 +38,7 @@ pipeline {
             }
         }
         stage('Quality Gate') {
+          agent { label 'build-node' }
             steps {
                 timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
                     waitForQualityGate abortPipeline: true
