@@ -6,14 +6,14 @@ pipeline {
     DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
-    API_KEY = credentials('API_KEY')
+    XAI_KEY = credentials('XAI_KEY')
     SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
     stages {
         stage('Build') {
             steps {
-              withCredentials([string(credentialsId: 'xai-key', variable: 'XAI_KEY')]) {
+
                 script {
                     // For Linux/Mac
                     sh './CICD_Scripts/frontend.sh'
@@ -21,7 +21,7 @@ pipeline {
 
                 }
             }
-            }
+            
         }
     
 
