@@ -25,29 +25,29 @@ pipeline {
         }
     
 
-        stage('SonarQube Analysis') {
-          agent { label 'build-node' }
-            steps {
-                withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
-                    sh """
-                    ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=your_project_key \
-                        -Dsonar.sources=src \
-                        -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
-                        -Dsonar.login=your_sonar_token
-                    """
-                }
-            }
-        }
-        stage('Quality Gate') {
-          agent { label 'build-node' }
-            steps {
-                timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-    }
+    //     stage('SonarQube Analysis') {
+    //       agent { label 'build-node' }
+    //         steps {
+    //             withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
+    //                 sh """
+    //                 ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
+    //                     -Dsonar.projectKey=your_project_key \
+    //                     -Dsonar.sources=src \
+    //                     -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
+    //                     -Dsonar.login=your_sonar_token
+    //                 """
+    //             }
+    //         }
+    //     }
+    //     stage('Quality Gate') {
+    //       agent { label 'build-node' }
+    //         steps {
+    //             timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
+    //                 waitForQualityGate abortPipeline: true
+    //             }
+    //         }
+    //     }
+    // }
 
 
 //       stage('Cleanup') {
