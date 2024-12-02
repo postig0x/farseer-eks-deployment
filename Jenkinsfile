@@ -21,7 +21,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
         stage('SonarQube Analysis') {
           agent { label 'build-node' }
@@ -45,6 +45,7 @@ pipeline {
                 }
             }
         }
+    }
 
 
 //       stage('Cleanup') {
