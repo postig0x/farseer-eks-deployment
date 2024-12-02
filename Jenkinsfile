@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
-    DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
+    // DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
+    // DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     XAI_KEY = credentials('XAI_KEY')
