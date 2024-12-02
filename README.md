@@ -22,6 +22,10 @@ The system prompt of an LLM allows you to define the context of the agent's role
 
 ## Optimization
 
+### Cost
+
+xAI 'grok-beta' avg request: ~$0.0483
+
 ### Backend Application
 
 The app can be structured better to support expanding capabilities for the agent. An example of this is by moving the LLM API calls to a separate module, in case other APIs are introduced.
