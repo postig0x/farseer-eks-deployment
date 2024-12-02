@@ -13,17 +13,17 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-
                 script {
+                    sh '''
                     chmod +x ./CICD_Scripts/frontend.sh
-                    sh './CICD_Scripts/frontend.sh'
+                    ./CICD_Scripts/frontend.sh
                     chmod +x ./CICD_Scripts/backend.sh
-                    sh './CICD_Scripts/backend.sh'
+                    ./CICD_Scripts/backend.sh
+                    '''
 
-                }
-            }
-            
-        }
+                      }
+                  } 
+              }
     
 
     //     stage('SonarQube Analysis') {
