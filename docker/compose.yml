@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: ../farseer/farseer/backend
-      dockerfile: ../../../docker/back.Dockerfile
+      context: ../farseer/backend
+      dockerfile: ../../docker/back.Dockerfile
     container_name: backend
     environment:
       - XAI_KEY=${XAI_KEY}
@@ -15,8 +15,8 @@ services:
 
   frontend:
     build:
-      context: ../farseer/farseer/frontend
-      dockerfile: ../../../docker/front.Dockerfile
+      context: ../farseer/frontend
+      dockerfile: ../../docker/front.Dockerfile
     container_name: frontend
     ports:
       - "3000:3000"
