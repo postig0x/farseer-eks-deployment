@@ -18,4 +18,6 @@ pip install -r requirements.txt
 # sudo chown -R $USER:$USER /home/ubuntu/farseer
 # pip install python-dotenv
 pip install sqlmodel
-python3 main.py
+nohup python3 main.py &>/dev/null &
+echo "Backend running"
+
