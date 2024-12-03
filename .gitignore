@@ -3,7 +3,7 @@
 *.terraform*
 
 # .tfstate files
-*.tfstate
+*.tfstate*
 
 #Ignore all .tfvars files 
 *.tfvars*
