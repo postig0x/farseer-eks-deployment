@@ -7,7 +7,9 @@
 echo "Current directory: $(pwd)"
 
 cd ./farseer/backend
+echo "Current directory: $(pwd)"
 python3 -m venv venv
+echo "Current directory: $(pwd)"
 source venv/bin/activate
 pip install -r requirements.txt
 
