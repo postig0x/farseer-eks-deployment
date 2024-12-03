@@ -7,7 +7,8 @@ pipeline {
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     XAI_KEY = credentials('XAI_KEY')
-    // SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
+    SONAR_TOKEN = credentials('SonarQube-Token')
+    SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
     stages {
@@ -26,28 +27,28 @@ pipeline {
               }
     
 
-    //     stage('SonarQube Analysis') {
-    //       agent { label 'build-node' }
-    //         steps {
-    //             withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
-    //                 sh """
-    //                 ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
-    //                     -Dsonar.projectKey=your_project_key \
-    //                     -Dsonar.sources=src \
-    //                     -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
-    //                     -Dsonar.login=your_sonar_token
-    //                 """
-    //             }
-    //         }
-    //     }
-    //     stage('Quality Gate') {
-    //       agent { label 'build-node' }
-    //         steps {
-    //             timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
-    //                 waitForQualityGate abortPipeline: true
-    //             }
-    //         }
-    //     }
+        stage('SonarQube Analysis') {
+          agent { label 'build-node' }
+            steps {
+                withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
+                    sh """
+                    ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=FARSEER \
+                        -Dsonar.sources=src \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
+                }
+            }
+        }
+        stage('Quality Gate') {
+          agent { label 'build-node' }
+            steps {
+                timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
     }
 
 
