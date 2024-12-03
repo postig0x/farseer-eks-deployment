@@ -1,19 +1,11 @@
-output "public_id" {
-  value = aws_subnet.public[*].id
+output "public_subnet_id" {
+  value = aws_subnet.public-subnet.id
 }
 
-output "private_id" {
-  value = aws_subnet.private[*].id
+output "private_subnet_id" {
+  value = aws_subnet.private-subnet.id
 }
 
-output "production_vpc_id" {
-  value= aws_vpc.production_vpc.id
-  
-}
-
-output "private_subnet_ids" {
-  value = aws_subnet.private[*].id
-}
-output "availability_zones"{
-  value= aws_availability_zones
+output "vpc_id" {
+  value= aws_vpc.vpc.id
 }

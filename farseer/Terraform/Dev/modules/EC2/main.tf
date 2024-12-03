@@ -6,18 +6,11 @@
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-sg"
   description = "Security group for frontend servers"
-  vpc_id      = var.dev_vpc_id.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -30,7 +23,7 @@ resource "aws_security_group" "bastion_sg" {
   }
 
   tags = {
-    Name = "dev-bastion-sg"
+    Name = "${var.environment}-bastion-sg"
   }
 }
 
@@ -38,10 +31,10 @@ resource "aws_security_group" "bastion_sg" {
 
 #Dev App Server Security Groups
 #Dev-Frontend-SG
-resource "aws_security_group" "dev_frontend_sg" {
+resource "aws_security_group" "frontend_sg" {
   name        = "Dev-frontend-private-subnet"
   description = "Security group for frontend servers"
-  vpc_id      = var.dev_vpc_id.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 22
@@ -70,15 +63,15 @@ resource "aws_security_group" "dev_frontend_sg" {
   }
 
   tags = {
-    Name = "dev-frontend-private-sg"
+    Name = "${var.environment}-frontend-private-sg"
   }
 }
 
 #backend-SG-AZ1
-resource "aws_security_group" "dev_backend_sg" {
+resource "aws_security_group" "backend_sg" {
   name        = "dev-backend-private-subnet-sg"
   description = "Security group for frontend servers"
-  vpc_id      = var.dev_vpc_id.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 22
@@ -93,7 +86,14 @@ resource "aws_security_group" "dev_backend_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -102,8 +102,35 @@ resource "aws_security_group" "dev_backend_sg" {
   }
 
   tags = {
-    Name = "dev-backend-private-sg"
+    Name = "${var.environment}-backend-private-sg"
   }
+}
+
+##################################################
+### SSH KEY ###
+##################################################
+# Read the public key from the specified path
+# //NOT USING THIS FOR NOW BUT LEAVING JUST IN CASE
+# locals {
+#   public_key = file(var.public_key_path)
+# }
+
+# Generate a new SSH key pair
+resource "tls_private_key" "generated_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ssh_key_pair" {
+  key_name   = var.key_name
+  public_key = tls_private_key.generated_key.public_key_openssh
+# public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
+}
+
+# Saving private key as local tmp file on Jenkins server.
+resource "local_file" "save_private_key" {
+  content  = tls_private_key.generated_key.private_key_pem
+  filename = "/tmp/${var.key_name}.pem" # Temp file
 }
 
 ###############################################################
@@ -112,40 +139,43 @@ resource "aws_security_group" "dev_backend_sg" {
 
 #EC2
 #Bastion Host 
-resource "aws_instance" "dev-bastion" {
-  ami                    = "ami-0866a3c8686eaeeba"
+resource "aws_instance" "bastion" {
+  ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.public_subnet_id.id
+  subnet_id              = var.public_subnet_id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
-  key_name               = "bastionHost-keypair"
+  key_name               = var.key_name
+  # user_data              = 
 
   tags = {
-    Name = "dev-bastion-host"
+    Name = "${var.environment}-bastion"
   }
 }
 
 #Frontend Private Subnet
-resource "aws_instance" "farseer-frontend" {
-  ami                    = "ami-0866a3c8686eaeeba"
+resource "aws_instance" "frontend" {
+  ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.private_subnet_id.id
-  vpc_security_group_ids = [aws_security_group.dev_frontend_sg]
-  key_name               = "bastionHost-keypair"
+  subnet_id              = var.private_subnet_id
+  vpc_security_group_ids = [aws_security_group.frontend_sg.id]
+  key_name               = var.key_name
+  # user_data              = 
 
   tags = {
-    Name = "dev-frontend"
+    Name = "${var.environment}-frontend"
   }
 
 }
-resource "aws_instance" "farseer-backend" {
-  ami                    = "ami-0866a3c8686eaeeba"
+resource "aws_instance" "backend" {
+  ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.private_subnet_id.id
-  vpc_security_group_ids = [aws_security_group.dev_backend_sg]
-  key_name               = "bastionHost-keypair"
+  subnet_id              = var.private_subnet_id
+  vpc_security_group_ids = [aws_security_group.backend_sg.id]
+  key_name               = var.key_name
+  # user_data              = 
 
   tags = {
-    Name = "dev-backend"
+    Name = "${var.environment}-backend"
   }
 
 }
