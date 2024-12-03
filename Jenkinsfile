@@ -89,7 +89,7 @@ pipeline {
 //         script {
 //             if (env.BRANCH_NAME == 'production') {
 //                 echo "Deploying to Production Environment"
-//                 dir('terraform/production') { // Navigate to the production environment directory
+//                 dir('terraform/Production') { // Navigate to the production environment directory
 //                     sh '''
 //                       echo "Current working directory:"
 //                       pwd
@@ -102,7 +102,7 @@ pipeline {
 //                 }
 //             } else if (env.BRANCH_NAME == 'qa') {
 //                 echo "Deploying to Testing Environment"
-//                 dir('terraform/qa') { // Navigate to the qa environment directory
+//                 dir('terraform/QA') { // Navigate to the qa environment directory
 //                     sh '''
 //                       echo "Current working directory:"
 //                       pwd
@@ -115,7 +115,7 @@ pipeline {
 //                 }
 //             } else if (env.BRANCH_NAME == 'develop') {
 //                 echo "Deploying to Staging Environment"
-//                 dir('terraform/develop') { // Navigate to the staging environment directory
+//                 dir('terraform/Dev') { // Navigate to the staging environment directory
 //                     sh '''
 //                       echo "Current working directory:"
 //                       pwd
