@@ -32,6 +32,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
                     sh """
+                    echo "Current directory: $(pwd)"
                     ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=FARSEER \
                         -Dsonar.sources=backend,frontend \
