@@ -35,7 +35,7 @@ pipeline {
                     echo "Current directory: $(pwd)"
                     ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=FARSEER \
-                        -Dsonar.sources=backend,frontend \
+                        -Dsonar.sources=FARSEER \
                         -Dsonar.host.url=http://localhost:9000 \
                         -Dsonar.login=${SONAR_TOKEN}
                     """
