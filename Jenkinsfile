@@ -34,7 +34,7 @@ pipeline {
                     sh """
                     ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=FARSEER \
-                        -Dsonar.sources=src \
+                        -Dsonar.sources=backend,frontend \
                         -Dsonar.host.url=http://localhost:9000 \
                         -Dsonar.login=${SONAR_TOKEN}
                     """
