@@ -8,3 +8,4 @@ node -v
 npm i
 npm run build
 nohup npm run start &>/dev/null &
+echo "frontend started"
