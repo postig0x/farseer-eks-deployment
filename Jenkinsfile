@@ -99,10 +99,9 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
+                        '''
+                          // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
                     }
                 } else if (env.BRANCH_NAME == 'qa') {
                     echo "Deploying to Testing Environment"
@@ -112,10 +111,7 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
+                        '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
@@ -125,25 +121,23 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
+                        '''
                     }
-                } else if (env.BRANCH_NAME.startsWith('feature/')) {
+                } else if (env.BRANCH_NAME ==~ /^feature\//) {
                     echo "Deploying to Staging Environment"
                     dir('terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
+                          echo "starting init"
                           terraform init
+                          echo "starting apply"
                           terraform apply -auto-approve
-
-              '''
+                        '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
                 } else {
-                    error("Unknown branch: ${env.BRANCH_NAME}")
+                    echo "No deployment for branch: ${env.BRANCH_NAME}"
                 }
             }
         }
