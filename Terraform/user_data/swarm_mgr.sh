@@ -37,7 +37,7 @@ sudo usermod -aG docker $USER
 #       |___/     
 # swarm manager
 private_ip=$(hostname -i)
-docker swarm init --advertise-addr $private_ip
+docker swarm init --advertise-addr ${private_ip}
 # save token
 docker swarm join-token -q worker > worker.token
 
@@ -46,8 +46,8 @@ docker swarm join-token -q worker > worker.token
 
 for worker in "${node_ips[@]}"
 do
-  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"$worker" "docker swarm join \
-    --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
+  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${worker}" "docker swarm join \
+    --token \$(cat /home/ubuntu/worker.token) \"${private_ip}\":2377"
 done
 
 # login to docker hub
