@@ -98,7 +98,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
+                          terraform apply -auto-approve
                         '''
                           // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
                           //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
@@ -110,7 +110,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
+                          terraform apply -auto-approve
                         '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
@@ -120,7 +120,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
+                          terraform apply -auto-approve
                         '''
                     }
                 } else if (env.BRANCH_NAME.startsWith('feature/')) {
@@ -129,9 +129,7 @@ pipeline {
                         sh '''
                           echo "Current working directory:"
                           pwd
-                          echo "starting init"
                           terraform init
-                          echo "starting apply"
                           terraform apply -auto-approve
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
