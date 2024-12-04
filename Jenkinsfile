@@ -93,7 +93,7 @@ pipeline {
             script {
                 if (env.BRANCH_NAME == 'production') {
                     echo "Deploying to Production Environment"
-                    dir('terraform/Production') { // Navigate to the production environment directory
+                    dir('Terraform/Production') { // Navigate to the production environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
@@ -105,7 +105,7 @@ pipeline {
                     }
                 } else if (env.BRANCH_NAME == 'qa') {
                     echo "Deploying to Testing Environment"
-                    dir('terraform/QA') { // Navigate to the qa environment directory
+                    dir('Terraform/QA') { // Navigate to the qa environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
@@ -115,7 +115,7 @@ pipeline {
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
-                    dir('terraform/Dev') { // Navigate to the staging environment directory
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
@@ -123,9 +123,9 @@ pipeline {
                           terraform apply -auto-approve \
                         '''
                     }
-                } else if (env.BRANCH_NAME =='feature/deploy_terraform') {
+                } else if (env.BRANCH_NAME.startsWith('feature/')) {
                     echo "Deploying to Staging Environment"
-                    dir('terraform/Dev') { // Navigate to the staging environment directory
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
