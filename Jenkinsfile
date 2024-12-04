@@ -73,13 +73,13 @@ pipeline {
                 // Build and push backend
                 sh '''
                   echo "Current directory: $(pwd)"
-                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f back.Dockerfile ./docker/
+                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f ./docker/back.Dockerfile .
                   docker push ${DOCKER_CREDS_USR}/farseer_back:latest
                 '''
                 
                 // Build and push frontend
                 sh '''
-                  docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f front.Dockerfile ./docker/
+                  docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f ./docker/front.Dockerfile .
                   docker push ${DOCKER_CREDS_USR}/farseer_front:latest
                 '''
             }
