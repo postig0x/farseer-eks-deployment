@@ -2,12 +2,13 @@ pipeline {
   agent any
 
   environment {
-    // DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
-    // DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
+    DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
+    DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     XAI_KEY = credentials('XAI_KEY')
-    // SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
+    SONAR_TOKEN = credentials('SonarQube-Token')
+    SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
     stages {
@@ -29,13 +30,13 @@ pipeline {
     //     stage('SonarQube Analysis') {
     //       agent { label 'build-node' }
     //         steps {
-    //             withSonarQubeEnv('SonarQube') { // 'SonarQube' is the name configured in Jenkins
+    //             withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
     //                 sh """
     //                 ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
-    //                     -Dsonar.projectKey=your_project_key \
-    //                     -Dsonar.sources=src \
-    //                     -Dsonar.host.url=http://<sonarqube-server-ip>:9000 \
-    //                     -Dsonar.login=your_sonar_token
+    //                     -Dsonar.projectKey=FARSEER \
+    //                     -Dsonar.sources=FARSEER \
+    //                     -Dsonar.host.url=http://localhost:9000 \
+    //                     -Dsonar.login=${SONAR_TOKEN}
     //                 """
     //             }
     //         }
@@ -48,41 +49,43 @@ pipeline {
     //             }
     //         }
     //     }
-    }
+    // }
 
 
-//       stage('Cleanup') {
-//         agent { label 'build-node' }
-//         steps {
-//           sh '''
-//             docker system prune -f
-//             git clean -ffdx -e "*.tfstate*" -e ".terraform/*"
-//           '''
-//         }
-//       }
+      stage('Cleanup') {
+        agent { label 'build-node' }
+        steps {
+          sh '''
+            docker system prune -f
+            git clean -ffdx -e "*.tfstate*" -e ".terraform/*"
+          '''
+        }
+      }
 
-//     stage('Build & Push Images') {
-//         agent { label 'build-node' }
-//         steps {
-//             // Log in to Docker Hub
-//             sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
+    stage('Build & Push Images') {
+        agent { label 'build-node' }
+        steps {
+            // Log in to Docker Hub
+            sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
             
-//             // Inject API Key
-//             withCredentials([string(credentialsId: 'MY_API_KEY', variable: 'API_KEY')]) {
-//                 // Build and push backend
-//                 sh '''
-//                   docker build --build-arg API_KEY=${API_KEY} -t ${DOCKER_CREDS_USR}/<backend_name>:latest -f Dockerfile.backend .
-//                   docker push ${DOCKER_CREDS_USR}/<backend_name>:latest
-//                 '''
+            // Inject API Key
+            withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
+                // Build and push backend
+                sh '''
+                  echo "Current directory: $(pwd)"
+                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f ./docker/back.Dockerfile .
+                  docker push ${DOCKER_CREDS_USR}/farseer_back:latest
+                '''
                 
-//                 // Build and push frontend
-//                 sh '''
-//                   docker build -t ${DOCKER_CREDS_USR}/<frontend_name>:latest -f Dockerfile.frontend .
-//                   docker push ${DOCKER_CREDS_USR}/<frontend_name>:latest
-//                 '''
-//             }
-//         }
-//     }
+                // Build and push frontend
+                sh '''
+                  docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f ./docker/front.Dockerfile .
+                  docker push ${DOCKER_CREDS_USR}/farseer_front:latest
+                '''
+            }
+        }
+    }
+    }
 
 // stage('Deploy') {
 //     steps {
