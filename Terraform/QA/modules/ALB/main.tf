@@ -28,7 +28,7 @@ resource "aws_lb" "load_balancer" {
   security_groups    = [aws_security_group.alb_sg.id]
   subnets            = [var.private_subnet_id1, var.private_subnet_id2]
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = {
     Environment = "qa"
