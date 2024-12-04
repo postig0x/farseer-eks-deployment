@@ -1,10 +1,6 @@
 #!/bin/bash
 sudo apt update
 
-# add ssh key for manager node to pass token to worker nodes
-echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
-chmod 600 /home/ubuntu/.ssh/dev_key.pem
-
 #     _         _           
 #  __| |___  __| |_____ _ _ 
 # / _` / _ \/ _| / / -_) '_|
@@ -39,12 +35,6 @@ sudo usermod -aG docker $USER
 docker swarm init --advertise-addr $(hostname -i)
 # save token
 docker swarm join-token -q worker > worker.token
-
-for ip in "${worker_ips[@]}"
-do
-  echo "copying worker.token to ${ip}"
-  scp -i /home/ubuntu/.ssh/dev_key.pem worker.token ubuntu@${ip}:/home/ubuntu
-done
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
