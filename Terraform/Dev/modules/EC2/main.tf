@@ -164,7 +164,7 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
   # user_data              = 
-
+  depends_on = [aws_instance.frontend, aws_instance.backend]
   tags = {
     Name = "${var.environment}-bastion"
   }
@@ -178,7 +178,7 @@ resource "aws_instance" "frontend" {
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.key_name
   # user_data              = 
-  depends_on = [aws_instance.bastion]
+
   tags = {
     Name = "${var.environment}-frontend"
   }
@@ -191,7 +191,6 @@ resource "aws_instance" "backend" {
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.key_name
   # user_data              = 
-  depends_on = [aws_instance.bastion]
 
   tags = {
     Name = "${var.environment}-backend"
