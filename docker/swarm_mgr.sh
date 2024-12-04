@@ -49,19 +49,24 @@ done
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 
+# create overlay network for services
+docker network create --driver overlay devnet
+
 # create frontend service for frontend node
 docker service create \
   --name frontend \
   --replicas 1 \
   --constraint 'node.hostname == ${node_ips[0]}' \
   --publish published=3000,target=3000 \
+  --network devnet \
   cloudbandits/farseer_front:latest
 
 # create backend service for backend node
 docker service create \
   --name backend \
   --replicas 1 \
-  --constraint 'node.hostname == ${node_ips[1]}' \
+  --constraint 'node.hostname == ${node_ips[1]}' \ # ip-123-12-12-12 format
   --publish published=8000,target=8000 \
   --env XAI_KEY=${XAI_KEY} \
+  --network devnet \
   cloudbandits/farseer_back:latest
