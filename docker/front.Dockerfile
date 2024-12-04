@@ -2,7 +2,7 @@ FROM node:20-slim
 
 WORKDIR /frontend
 
-COPY . .
+COPY ../farseer/frontend .
 
 RUN npm i
 
