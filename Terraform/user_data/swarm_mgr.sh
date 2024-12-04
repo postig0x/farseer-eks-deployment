@@ -44,6 +44,8 @@ docker swarm join-token -q worker > worker.token
 # make node_ips space separated string
 IFS=' ' read -r -a node_ips <<< "$node_ips"
 
+echo "node_ips: ${node_ips}"
+
 for worker in "${node_ips[@]}"
 do
   ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"$worker" "docker swarm join \
