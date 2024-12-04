@@ -147,7 +147,7 @@ pipeline {
             }
         }
     }
-    }
+    
   
 
     // Add a Cleanup Stage Here
@@ -161,6 +161,7 @@ pipeline {
       }
     }
     }
+}
 
     // stage('Destroy') {
     //   agent { label 'build-node' }
