@@ -10,8 +10,6 @@ pipeline {
     XAI_KEY = credentials('XAI_KEY')
   }
 
-
-
     stages {
         stage('Build') {
             steps {
@@ -154,16 +152,16 @@ pipeline {
 
 
 
-    stage('Destroy') {
-      agent { label 'build-node' }
-      steps {
-        dir('Terraform/Dev') {
-          sh ''' 
-            terraform destroy -auto-approve
-          '''
-        }
-      }
-    }
+    // stage('Destroy') {
+    //   agent { label 'build-node' }
+    //   steps {
+    //     dir('Terraform/Dev') {
+    //       sh ''' 
+    //         terraform destroy -auto-approve
+    //       '''
+    //     }
+    //   }
+    // }
     }
         }
   
