@@ -133,21 +133,18 @@ pipeline {
                 } else if (env.BRANCH_NAME.startsWith('feature/')) {
                     echo "Deploying to Staging Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
-                    withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
-                          sh '''
-                            echo "Current working directory:"
-                            pwd
-                            terraform init
-                            terraform apply -auto-approve \
-                            -var="dev_key=${DEV_KEY}"
-                            -var="DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
-                            -var="DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
-                            -var="XAI_KEY=${XAI_KEY}"
-
-                          '''
-                      // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
-                    }
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve \
+                          -var "dev_key=${DEV_KEY}"
+                          -var "DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
+                          -var "DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
+                          -var "XAI_KEY=${XAI_KEY}"
+                        '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+                  }
                 } else {
                     echo "No deployment for branch: ${env.BRANCH_NAME}"
                     error("Unknown branch: ${env.BRANCH_NAME}")
