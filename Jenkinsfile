@@ -154,7 +154,7 @@ pipeline {
         '''
       }
     }
-    }
+
 
 
     stage('Destroy') {
@@ -168,6 +168,7 @@ pipeline {
       }
     }
     }
+        }
   
 
 
