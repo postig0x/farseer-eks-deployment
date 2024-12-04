@@ -25,14 +25,3 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo groupadd docker
 
 sudo usermod -aG docker $USER
-
-#               _     
-#  _ _  ___  __| |___ 
-# | ' \/ _ \/ _` / -_)
-# |_||_\___/\__,_\___|
-# swarm node
-# copy worker token from manager node
-scp -i /home/ubuntu/.ssh/dev_key.pem ubuntu@${mgr_ip}:/home/ubuntu/worker.token /home/ubuntu/worker.token
-
-# join swarm
-docker swarm join --token $(cat /home/ubuntu/worker.token) "${mgr_ip}":2377
