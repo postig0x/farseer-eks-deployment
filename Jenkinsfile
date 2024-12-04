@@ -8,8 +8,6 @@ pipeline {
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     DEV_KEY =credentials('dev_key')
     XAI_KEY = credentials('XAI_KEY')
-    SONAR_TOKEN = credentials('SonarQube-Token')
-    SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
 
@@ -30,29 +28,16 @@ pipeline {
               }
     
 
-    //     stage('SonarQube Analysis') {
-    //       agent { label 'build-node' }
-    //         steps {
-    //             withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
-    //                 sh """
-    //                 ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
-    //                     -Dsonar.projectKey=FARSEER \
-    //                     -Dsonar.sources=FARSEER \
-    //                     -Dsonar.host.url=http://localhost:9000 \
-    //                     -Dsonar.login=${SONAR_TOKEN}
-    //                 """
-    //             }
-    //         }
-    //     }
-    //     stage('Quality Gate') {
-    //       agent { label 'build-node' }
-    //         steps {
-    //             timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
-    //                 waitForQualityGate abortPipeline: true
-    //             }
-    //         }
-    //     }
-    // }
+        stage ('Sec-Check: OWASP') {
+            environment {
+                NVD_APIKEY = credentials("NVD-ApiKey")
+            }
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${NVD_APIKEY}', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
 
 
       stage('Cleanup') {
