@@ -150,16 +150,16 @@ pipeline {
     }
   
 
-//     // Add a Cleanup Stage Here
-//     stage('post stage') {
-//       agent { label 'build-node' } // Specify your preferred agent here
-//       steps {
-//         sh '''
-//           docker logout
-//           docker system prune -f
-//         '''
-//       }
-    // }
+    // Add a Cleanup Stage Here
+    stage('Cleanup') {
+      agent { label 'build-node' } // Specify your preferred agent here
+      steps {
+        sh '''
+          docker logout
+          docker system prune -f
+        '''
+      }
+    }
     }
 
     // stage('Destroy') {
