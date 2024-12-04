@@ -10,7 +10,6 @@ chmod 600 /home/ubuntu/.ssh/dev_key.pem
 # / _` / _ \/ _| / / -_) '_|
 # \__,_\___/\__|_\_\___|_|  
 
-
 # docker gpg key
 sudo apt install -y ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -25,7 +24,6 @@ echo \
 sudo apt update
 
 # install docker
-
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 sudo groupadd docker
@@ -38,6 +36,6 @@ sudo usermod -aG docker $USER
 # |_||_\___/\__,_\___|
 # swarm node
 
-scp -i /home/ubuntu/.ssh/dev_key.pem ubuntu@${mgr_ip}:/home/ubuntu/worker.token /homew/ubuntu/worker.token
+scp -i /home/ubuntu/.ssh/dev_key.pem ubuntu@${mgr_ip}:/home/ubuntu/worker.token /home/ubuntu/worker.token
 
 docker swarm join --token $(cat /home/ubuntu/worker.token) "${mgr_ip}":2377
