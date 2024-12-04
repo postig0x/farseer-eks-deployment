@@ -155,18 +155,6 @@ resource "local_file" "save_private_key" {
 #EC2
 ##############################################################
 
-
-# Create a null resource to generate the node_ips_string
-resource "null_resource" "generate_node_ips" {
-  depends_on = [aws_instance.frontend, aws_instance.backend]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "${aws_instance.backend.private_ip} ${aws_instance.frontend.private_ip}" > node_ips.txt
-    EOT
-  }
-}
-
 #EC2
 #Bastion Host 
 resource "aws_instance" "bastion" {
@@ -176,13 +164,13 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
   user_data              = base64encode(templatefile("${path.root}/../user_data/swarm_mgr.sh", {
-    node_ips = file("node_ips.txt"),
+    node_ips = "${aws_instance.backend.private_ip} ${aws_instance.frontend.private_ip}",
     dev_key = var.dev_key,
     DOCKER_CREDS_USR = var.docker_usr,
     DOCKER_CREDS_PSW = var.docker_psw,
     XAI_KEY = var.xai_key
   }))
-  depends_on = [null_resource.generate_node_ips]
+  depends_on = [aws_instance.frontend, aws_instance.backend]
   tags = {
     Name = "${var.environment}-bastion"
   }
