@@ -43,7 +43,7 @@ docker swarm join-token -q worker > worker.token
 
 IFS=' ' read -r -a node_ips_array <<< "${node_ips}"
 
-echo "node_ips_array: $node_ips_array"
+echo "node_ips_array: ${node_ips_array[@]}"
 
 for worker in "${node_ips_array[@]}"
 do
@@ -58,8 +58,8 @@ echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 docker network create --driver overlay devnet
 
 # correctly format node_ips to ip-0-0-0-0 format
-frontend_ip=$(echo "${node_ips[0]}" | sed 's/./-/g; s/^/ip-/')
-backend_ip=$(echo "${node_ips[1]}" | sed 's/./-/g; s/^/ip-/')
+frontend_ip=$(echo "${node_ips_array[0]}" | sed 's/./-/g; s/^/ip-/')
+backend_ip=$(echo "${node_ips_array[1]}" | sed 's/./-/g; s/^/ip-/')
 
 # create frontend service for frontend node
 docker service create \
