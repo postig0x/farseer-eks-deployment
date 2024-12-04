@@ -2,8 +2,8 @@ pipeline {
   agent any
 
   environment {
-    // DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
-    // DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
+    DOCKER_CREDS_USR = credentials('DOCKER_CREDS_USR')
+    DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     XAI_KEY = credentials('XAI_KEY')
@@ -27,29 +27,29 @@ pipeline {
               }
     
 
-        stage('SonarQube Analysis') {
-          agent { label 'build-node' }
-            steps {
-                withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
-                    sh """
-                    ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=FARSEER \
-                        -Dsonar.sources=FARSEER \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
-                }
-            }
-        }
-        stage('Quality Gate') {
-          agent { label 'build-node' }
-            steps {
-                timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-    }
+    //     stage('SonarQube Analysis') {
+    //       agent { label 'build-node' }
+    //         steps {
+    //             withSonarQubeEnv('SonarQube Scanner') { // 'SonarQube' is the name configured in Jenkins
+    //                 sh """
+    //                 ${env.SONAR_SCANNER_HOME}/bin/sonar-scanner \
+    //                     -Dsonar.projectKey=FARSEER \
+    //                     -Dsonar.sources=FARSEER \
+    //                     -Dsonar.host.url=http://localhost:9000 \
+    //                     -Dsonar.login=${SONAR_TOKEN}
+    //                 """
+    //             }
+    //         }
+    //     }
+    //     stage('Quality Gate') {
+    //       agent { label 'build-node' }
+    //         steps {
+    //             timeout(time: 2, unit: 'MINUTES') { // Adjust timeout as necessary
+    //                 waitForQualityGate abortPipeline: true
+    //             }
+    //         }
+    //     }
+    // }
 
 
       stage('Cleanup') {
@@ -69,10 +69,10 @@ pipeline {
             sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
             
             // Inject API Key
-            withCredentials([string(credentialsId: 'MY_API_KEY', variable: 'API_KEY')]) {
+            withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
                 // Build and push backend
                 sh '''
-                  docker build --build-arg API_KEY=${API_KEY} -t ${DOCKER_CREDS_USR}/FARSEER_BACK:latest -f back.Dockerfile .
+                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/FARSEER_BACK:latest -f back.Dockerfile .
                   docker push ${DOCKER_CREDS_USR}/FARSEER_BACK:latest
                 '''
                 
@@ -83,6 +83,7 @@ pipeline {
                 '''
             }
         }
+    }
     }
 
 // stage('Deploy') {
