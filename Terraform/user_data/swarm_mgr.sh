@@ -42,7 +42,7 @@ docker swarm init --advertise-addr $private_ip
 docker swarm join-token -q worker > worker.token
 
 # make node_ips space separated string
-IFS=' ' read -r -a node_ips <<< "$node_ips"
+# IFS=' ' read -r -a node_ips <<< "$node_ips"
 
 for worker in "${node_ips[@]}"
 do
