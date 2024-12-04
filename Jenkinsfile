@@ -123,7 +123,7 @@ pipeline {
                           terraform apply -auto-approve \
                         '''
                     }
-                } else if (env.BRANCH_NAME ==~ /^feature\//) {
+                } else if (env.BRANCH_NAME =='feature/deploy_terraform') {
                     echo "Deploying to Staging Environment"
                     dir('terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
