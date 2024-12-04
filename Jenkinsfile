@@ -124,10 +124,10 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                           -var "dev_key=${DEV_KEY}"
-                           -var "DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
-                           -var "DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
-                           -var "XAI_KEY=${XAI_KEY}"                          
+                            -var dev_key="${DEV_KEY}" \
+                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
+                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
+                            -var XAI_KEY="${XAI_KEY}"      
                         '''
                     }
                 } else if (env.BRANCH_NAME.startsWith('feature/')) {
@@ -138,10 +138,10 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                          -var "dev_key=${DEV_KEY}"
-                          -var "DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
-                          -var "DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
-                          -var "XAI_KEY=${XAI_KEY}"
+                            -var dev_key="${DEV_KEY}" \
+                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
+                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
+                            -var XAI_KEY="${XAI_KEY}"
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                   }
