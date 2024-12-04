@@ -43,7 +43,7 @@ docker swarm join-token -q worker > worker.token
 
 read -a node_ips_array <<< "${node_ips}"
 
-for worker in "${node_ips_array[@]}"
+for worker in "${node_ips}"
 do
   ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"$worker" "docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
