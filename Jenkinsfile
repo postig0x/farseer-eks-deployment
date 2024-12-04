@@ -88,6 +88,7 @@ pipeline {
     
 
     stage('Deploy') {
+        agent { label 'build-node' }
         steps {
             script {
                 if (env.BRANCH_NAME == 'production') {
