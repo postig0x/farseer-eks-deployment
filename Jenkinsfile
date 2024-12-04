@@ -138,6 +138,7 @@ pipeline {
                     }
                 } else {
                     echo "No deployment for branch: ${env.BRANCH_NAME}"
+                    error("Unknown branch: ${env.BRANCH_NAME}")
                 }
             }
         }
