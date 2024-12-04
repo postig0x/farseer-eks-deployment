@@ -72,6 +72,7 @@ pipeline {
             withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
                 // Build and push backend
                 sh '''
+                  echo "Current directory: $(pwd)"
                   docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f back.Dockerfile ./docker/
                   docker push ${DOCKER_CREDS_USR}/farseer_back:latest
                 '''
