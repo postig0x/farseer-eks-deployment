@@ -72,14 +72,14 @@ pipeline {
             withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
                 // Build and push backend
                 sh '''
-                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/FARSEER_BACK:latest -f back.Dockerfile ./docker/
-                  docker push ${DOCKER_CREDS_USR}/FARSEER_BACK:latest
+                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f back.Dockerfile ./docker/
+                  docker push ${DOCKER_CREDS_USR}/farseer_back:latest
                 '''
                 
                 // Build and push frontend
                 sh '''
-                  docker build -t ${DOCKER_CREDS_USR}/FARSEER_FRONT:latest -f front.Dockerfile ./docker/
-                  docker push ${DOCKER_CREDS_USR}/FARSEER_FRONT:latest
+                  docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f front.Dockerfile ./docker/
+                  docker push ${DOCKER_CREDS_USR}/farseer_front:latest
                 '''
             }
         }
