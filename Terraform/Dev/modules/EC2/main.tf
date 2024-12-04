@@ -182,7 +182,7 @@ resource "aws_instance" "bastion" {
     DOCKER_CREDS_PSW = var.docker_psw,
     XAI_KEY = var.xai_key
   }))
-  depends_on = [aws_instance.frontend, aws_instance.backend]
+  depends_on = [null_resource.generate_node_ips]
   tags = {
     Name = "${var.environment}-bastion"
   }
