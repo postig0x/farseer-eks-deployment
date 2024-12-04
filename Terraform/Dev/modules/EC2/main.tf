@@ -163,7 +163,13 @@ resource "aws_instance" "bastion" {
   subnet_id              = var.public_subnet_id
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
-  # user_data              = 
+  user_data              = templatefile("${path.root}/../../../../docker/swarm_mgr.sh", {
+    node_ips = [aws_instance.frontend.private_ip, aws_instance.backend.private_ip],
+    dev_key = var.dev_key,
+    DOCKER_CREDS_USR = var.DOCKER_CREDS_USR,
+    DOCKER_CREDS_PSW = var.DOCKER_CREDS_PSW,
+    XAI_KEY = var.XAI_KEY
+  })
   depends_on = [aws_instance.frontend, aws_instance.backend]
   tags = {
     Name = "${var.environment}-bastion"
@@ -177,7 +183,7 @@ resource "aws_instance" "frontend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.key_name
-  # user_data              = 
+  user_data              = templatefile("${path.root}/../../../../docker/swarm_node.sh")
 
   tags = {
     Name = "${var.environment}-frontend"
@@ -190,7 +196,7 @@ resource "aws_instance" "backend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.key_name
-  # user_data              = 
+  user_data              = templatefile("${path.root}/../../../../docker/swarm_node.sh")
 
   tags = {
     Name = "${var.environment}-backend"

@@ -18,6 +18,11 @@ variable "vpc_id" {}
 variable "public_subnet_id" {}
 
 variable "private_subnet_id" {}
+variable "dev_key" {}
+variable "DOCKER_CREDS_USR"{}
+variable "DOCKER_CREDS_PSW" {}
+variable "XAI_KEY" {}
+
 
 variable "key_name" {
   type = string

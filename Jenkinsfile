@@ -6,10 +6,13 @@ pipeline {
     DOCKER_CREDS_PSW = credentials('DOCKER_CREDS_PSW')
     AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
+    DEV_KEY =credentials('dev_key')
     XAI_KEY = credentials('XAI_KEY')
     SONAR_TOKEN = credentials('SonarQube-Token')
     SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
+
+
 
     stages {
         stage('Build') {
@@ -120,7 +123,11 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform apply -auto-approve \
+                           -var="dev_key=${DEV_KEY}"
+                           -var="DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
+                           -var="DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
+                           -var="XAI_KEY=${XAI_KEY}"                          
                         '''
                     }
                 } else if (env.BRANCH_NAME.startsWith('feature/')) {
@@ -130,7 +137,12 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform apply -auto-approve \
+                           -var="dev_key=${DEV_KEY}"
+                           -var="DOCKER_CREDS_USR=${DOCKER_CREDS_USR}"
+                           -var="DOCKER_CREDS_PSW=${DOCKER_CREDS_PSW}"
+                           -var="XAI_KEY=${XAI_KEY}"
+
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
