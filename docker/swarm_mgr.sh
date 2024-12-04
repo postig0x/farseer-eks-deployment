@@ -1,4 +1,11 @@
 #!/bin/bash
+# inputs needed
+# ${node_ips[@]} - array of frontend and backend private IPS
+# ${dev_key} - ssh key for manager node to pass token to worker nodes
+# ${DOCKER_CREDS_USR} - docker hub username
+# ${DOCKER_CREDS_PSW} - docker hub password
+# ${XAI_KEY} - openai api key
+
 sudo apt update
 
 # add ssh key for manager node to pass token to worker nodes
