@@ -56,11 +56,15 @@ echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 # create overlay network for services
 docker network create --driver overlay devnet
 
+# correctly format node_ips to ip-0-0-0-0 format
+frontend_ip=echo "${node_ips[0]}" | sed 's/./-/g; s/^/ip-/'
+backend_ip=echo "${node_ips[1]}" | sed 's/./-/g; s/^/ip-/'
+
 # create frontend service for frontend node
 docker service create \
   --name frontend \
   --replicas 1 \
-  --constraint 'node.hostname == ${node_ips[0]}' \
+  --constraint 'node.hostname == ${frontend_ip}' \
   --publish published=3000,target=3000 \
   --network devnet \
   cloudbandits/farseer_front:latest
@@ -69,7 +73,7 @@ docker service create \
 docker service create \
   --name backend \
   --replicas 1 \
-  --constraint 'node.hostname == ${node_ips[1]}' \
+  --constraint 'node.hostname == ${backend_ip}' \
   --publish published=8000,target=8000 \
   --env XAI_KEY=${XAI_KEY} \
   --network devnet \
