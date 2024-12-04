@@ -8,8 +8,8 @@ pipeline {
     AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     DEV_KEY =credentials('dev_key')
     XAI_KEY = credentials('XAI_KEY')
-    SONAR_TOKEN = credentials('SonarQube-Token')
-    SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
+    // SONAR_TOKEN = credentials('SonarQube-Token')
+    // SONAR_SCANNER_HOME = tool 'SonarQube Scanner' // Name configured in Jenkins global tools
   }
 
 
