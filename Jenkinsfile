@@ -88,60 +88,54 @@ pipeline {
     
 
     stage('Deploy') {
+        agent { label 'build-node' }
         steps {
             script {
                 if (env.BRANCH_NAME == 'production') {
                     echo "Deploying to Production Environment"
-                    dir('terraform/Production') { // Navigate to the production environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
-                    }
-                } else if (env.BRANCH_NAME == 'qa') {
-                    echo "Deploying to Testing Environment"
-                    dir('terraform/QA') { // Navigate to the qa environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
-                    }
-                } else if (env.BRANCH_NAME == 'develop') {
-                    echo "Deploying to Staging Environment"
-                    dir('terraform/Dev') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve \
-                            -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                            -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-              '''
-                    }
-                } else if (env.BRANCH_NAME.startsWith('feature/')) {
-                    echo "Deploying to Staging Environment"
-                    dir('terraform/Dev') { // Navigate to the staging environment directory
+                    dir('Terraform/Production') { // Navigate to the production environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
                           terraform apply -auto-approve
-
-              '''
+                        '''
+                          // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
+                    }
+                } else if (env.BRANCH_NAME == 'qa') {
+                    echo "Deploying to Testing Environment"
+                    dir('Terraform/QA') { // Navigate to the qa environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
+                    }
+                } else if (env.BRANCH_NAME == 'develop') {
+                    echo "Deploying to Staging Environment"
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
+                    }
+                } else if (env.BRANCH_NAME.startsWith('feature/')) {
+                    echo "Deploying to Staging Environment"
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
                 } else {
+                    echo "No deployment for branch: ${env.BRANCH_NAME}"
                     error("Unknown branch: ${env.BRANCH_NAME}")
                 }
             }
