@@ -56,8 +56,6 @@ echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 docker network create --driver overlay devnet
 
 # correctly format node_ips to ip-0-0-0-0 format
-# frontend_ip=$(echo "${node_ips_array[0]}" | sed 's/./-/g; s/^/ip-/')
-# backend_ip=$(echo "${node_ips_array[1]}" | sed 's/./-/g; s/^/ip-/')
 frontend_ip="ip-\"$node_ips_array[0]\"//./-/g"
 backend_ip="ip-\"$node_ips_array[1]\"//./-/g" 
 
