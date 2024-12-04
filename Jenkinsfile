@@ -151,7 +151,7 @@ pipeline {
   
 
     // Add a Cleanup Stage Here
-    stage('Cleanup') {
+    stage('logout') {
       agent { label 'build-node' } // Specify your preferred agent here
       steps {
         sh '''
