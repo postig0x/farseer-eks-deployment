@@ -75,7 +75,7 @@ docker service create \
 docker service create \
   --name backend \
   --replicas 1 \
-  --constraint 'node.hostname == ${node_ips[1]}' \ # ip-123-12-12-12 format
+  --constraint 'node.hostname == ${node_ips[1]}' \
   --publish published=8000,target=8000 \
   --env XAI_KEY=${XAI_KEY} \
   --network devnet \
