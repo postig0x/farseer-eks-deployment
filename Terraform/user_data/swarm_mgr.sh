@@ -4,7 +4,7 @@ sudo apt update
 
 # add ssh key for manager node to pass token to worker nodes
 echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
-chmod 600 /home/ubuntu/.ssh/dev_key.pem
+chmod 400 /home/ubuntu/.ssh/dev_key.pem
 
 #     _         _           
 #  __| |___  __| |_____ _ _ 
@@ -41,13 +41,12 @@ docker swarm init --advertise-addr $private_ip
 # save token
 docker swarm join-token -q worker > worker.token
 
-read -a node_ips_array <<< "${node_ips}"
 
-for worker in "${node_ips}"
-do
-  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"$worker" "docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
-done
+
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "docker swarm join \
+    --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
@@ -56,8 +55,8 @@ echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 docker network create --driver overlay devnet
 
 # correctly format node_ips to ip-0-0-0-0 format
-frontend_ip="ip-\"$node_ips_array[0]\"//./-/g"
-backend_ip="ip-\"$node_ips_array[1]\"//./-/g" 
+frontend_ip="ip-${front_ip}//./-/g"
+backend_ip="ip-${back_ip}//./-/g" 
 
 echo "frontend_ip: $frontend_ip"
 echo "backend_ip: $backend_ip"

@@ -164,7 +164,8 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
   user_data              = templatefile("${path.root}/../user_data/swarm_mgr.sh", {
-    node_ips = "${aws_instance.backend.private_ip} ${aws_instance.frontend.private_ip}",
+    front_ip = "${aws_instance.backend.private_ip}",
+    back_ip = "${aws_instance.frontend.private_ip}",
     dev_key = var.dev_key,
     DOCKER_CREDS_USR = var.docker_usr,
     DOCKER_CREDS_PSW = var.docker_psw,
