@@ -58,8 +58,8 @@ docker network create --driver overlay devnet
 # correctly format node_ips to ip-0-0-0-0 format
 # frontend_ip=$(echo "${node_ips_array[0]}" | sed 's/./-/g; s/^/ip-/')
 # backend_ip=$(echo "${node_ips_array[1]}" | sed 's/./-/g; s/^/ip-/')
-frontend_ip="ip-${node_ips_array[0]}//./-/g"
-backend_ip="ip-${node_ips_array[1]}//./-/g"
+frontend_ip="ip-\"$node_ips_array[0]\"//./-/g"
+backend_ip="ip-\"$node_ips_array[1]\"//./-/g" 
 
 echo "frontend_ip: $frontend_ip"
 echo "backend_ip: $backend_ip"
