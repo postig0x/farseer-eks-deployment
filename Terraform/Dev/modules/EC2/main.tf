@@ -166,9 +166,9 @@ resource "aws_instance" "bastion" {
   user_data              = templatefile("${path.root}/../../../../docker/swarm_mgr.sh", {
     node_ips = [aws_instance.frontend.private_ip, aws_instance.backend.private_ip],
     dev_key = var.dev_key,
-    DOCKER_CREDS_USR = var.DOCKER_CREDS_USR,
-    DOCKER_CREDS_PSW = var.DOCKER_CREDS_PSW,
-    XAI_KEY = var.XAI_KEY
+    DOCKER_CREDS_USR = var.docker_usr,
+    DOCKER_CREDS_PSW = var.docker_psw,
+    XAI_KEY = var.xai_key
   })
   depends_on = [aws_instance.frontend, aws_instance.backend]
   tags = {

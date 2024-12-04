@@ -19,9 +19,9 @@ variable "public_subnet_id" {}
 
 variable "private_subnet_id" {}
 variable "dev_key" {}
-variable "DOCKER_CREDS_USR"{}
-variable "DOCKER_CREDS_PSW" {}
-variable "XAI_KEY" {}
+variable "docker_usr"{}
+variable "docker_psw" {}
+variable "xai_key" {}
 
 
 variable "key_name" {

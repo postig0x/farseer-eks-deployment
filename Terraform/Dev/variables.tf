@@ -30,3 +30,21 @@ variable "key_name" {
   type    = string
   default = "dev-ssh-key"
 }
+
+variable "dev_key" {
+  sensitive = true
+}
+
+variable "XAI_KEY" {
+  type = string
+  sensitive = true
+}
+
+variable "DOCKER_CREDS_USR" {
+  type = string
+}
+
+variable "DOCKER_CREDS_PSW" {
+  type = string
+  sensitive = true
+}
