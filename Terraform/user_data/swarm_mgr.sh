@@ -47,9 +47,12 @@ docker swarm init --advertise-addr $private_ip
 # save token
 docker swarm join-token -q worker > worker.token
 
-for worker in "$node_ips[@]"
+# make node_ips space separated string
+IFS=' ' read -r -a node_ips <<< "$node_ips"
+
+for worker in "${node_ips[@]}"
 do
-  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@$worker "docker swarm join \
+  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"$worker" "docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 done
 
