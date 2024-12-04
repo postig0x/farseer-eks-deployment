@@ -1,6 +1,10 @@
 #!/bin/bash
 sudo apt update
 
+# add ssh key for manager node to pass token to worker nodes
+echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
+chmod 600 /home/ubuntu/.ssh/dev_key.pem
+
 #     _         _           
 #  __| |___  __| |_____ _ _ 
 # / _` / _ \/ _| / / -_) '_|
@@ -26,15 +30,21 @@ sudo groupadd docker
 
 sudo usermod -aG docker $USER
 
-
 #  _ __  __ _ _ _ 
 # | '  \/ _` | '_|
 # |_|_|_\__, |_|  
 #       |___/     
 # swarm manager
-docker swarm init --advertise-addr $(hostname -i)
+private_ip=$(hostname -i)
+docker swarm init --advertise-addr $private_ip
 # save token
 docker swarm join-token -q worker > worker.token
+
+for worker in "$node_ips[@]"
+do
+  ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@$worker "docker swarm join \
+    --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
+done
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
