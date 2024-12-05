@@ -72,10 +72,10 @@ sudo docker swarm init --advertise-addr $private_ip
 sudo docker swarm join-token -q worker > worker.token
 
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem root@"${front_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem root@"${back_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 # login to docker hub
