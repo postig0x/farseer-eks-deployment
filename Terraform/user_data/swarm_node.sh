@@ -1,8 +1,8 @@
 #!/bin/bash
 sudo apt update
 
-SSH_PUBKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaBSpmz07+rUAG//8rrPxDztMN3a9yGCuzDGseWlUi1IuPcXflCeQoOhQZsVExxxHaRgtP8BU/U/6ETbk6fqbFRge5iT7xp28sqWLaBF9bv3RbSpZOrVunNwn2v6eZCXwulMn53YtdUZRHJlquf7keKwhqDWTF4RhGdret+5qQNCC6VaiMsYXkwLayxwrupz7X75SIovHcw+zkby/jF/woSDtzY9OjAAuIQXljpOwvCHYneHRSxhmY7Ca1X7dXgREVz51LSXf1SzbryTF5cGSRBFElg4bEi6uthUeveTaduy3WD0dI5hdQpjFJBcCVWWyyS2TKH0KxXISXIO48y05n
-"
+SSH_PUBKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaBSpmz07+rUAG//8rrPxDztMN3a9yGCuzDGseWlUi1IuPcXflCeQoOhQZsVExxxHaRgtP8BU/U/6ETbk6fqbFRge5iT7xp28sqWLaBF9bv3RbSpZOrVunNwn2v6eZCXwulMn53YtdUZRHJlquf7keKwhqDWTF4RhGdret+5qQNCC6VaiMsYXkwLayxwrupz7X75SIovHcw+zkby/jF/woSDtzY9OjAAuIQXljpOwvCHYneHRSxhmY7Ca1X7dXgREVz51LSXf1SzbryTF5cGSRBFElg4bEi6uthUeveTaduy3WD0dI5hdQpjFJBcCVWWyyS2TKH0KxXISXIO48y05n"
+
 echo "$SSH_PUBKEY" >> /home/ubuntu/.ssh/authorized_keys
 
 #     _         _           

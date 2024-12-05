@@ -34,7 +34,7 @@ sudo usermod -aG docker $USER
 # install nginx
 sudo apt install -y nginx
 
-# modify nginx config
+# modify nginx config (/etc/nginx/sites-available/default)
 
 # start and enable nginx
 sudo systemctl start nginx
