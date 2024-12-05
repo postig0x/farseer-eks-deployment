@@ -71,7 +71,8 @@ echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 # create overlay network for services
 sudo docker network create --driver overlay devnet
 
-# correctly format node_ips to ip-0-0-0-0 format
+# format node IPs to ip-0-0-0-0 format
+# used for createing docker services
 frontend_ip="ip-${front_ip}"
 frontend_ip=$(echo $frontend_ip | sed 's/\./\-/g')
 
