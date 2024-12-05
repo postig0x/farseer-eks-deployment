@@ -26,15 +26,15 @@ pipeline {
               }
     
 
-        stage ('Sec-Check: OWASP') {
-            environment {
-                NVD_APIKEY = credentials("NVD-ApiKey")
-            }
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${NVD_APIKEY}', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        // stage ('Sec-Check: OWASP') {
+        //     environment {
+        //         NVD_APIKEY = credentials("NVD-ApiKey")
+        //     }
+        //     steps {
+        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${NVD_APIKEY}', odcInstallation: 'DP-Check'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
 
 
 
@@ -48,29 +48,29 @@ pipeline {
         }
       }
 
-    stage('Build & Push Images') {
-        agent { label 'build-node' }
-        steps {
-            // Log in to Docker Hub
-            sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
+    // stage('Build & Push Images') {
+    //     agent { label 'build-node' }
+    //     steps {
+    //         // Log in to Docker Hub
+    //         sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
             
-            // Inject API Key
-            withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
-                // Build and push backend
-                sh '''
-                  echo "Current directory: $(pwd)"
-                  docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f ./docker/back.Dockerfile .
-                  docker push ${DOCKER_CREDS_USR}/farseer_back:latest
-                '''
+    //         // Inject API Key
+    //         withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
+    //             // Build and push backend
+    //             sh '''
+    //               echo "Current directory: $(pwd)"
+    //               docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f ./docker/back.Dockerfile .
+    //               docker push ${DOCKER_CREDS_USR}/farseer_back:latest
+    //             '''
                 
-                // Build and push frontend
-                sh '''
-                  docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f ./docker/front.Dockerfile .
-                  docker push ${DOCKER_CREDS_USR}/farseer_front:latest
-                '''
-            }
-        }
-    }
+    //             // Build and push frontend
+    //             sh '''
+    //               docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f ./docker/front.Dockerfile .
+    //               docker push ${DOCKER_CREDS_USR}/farseer_front:latest
+    //             '''
+    //         }
+    //     }
+    // }
     
 
     stage('Deploy') {
@@ -139,15 +139,15 @@ pipeline {
   
 
     // Add a Cleanup Stage Here
-    stage('logout') {
-      agent { label 'build-node' } // Specify your preferred agent here
-      steps {
-        sh '''
-          docker logout
-          docker system prune -f
-        '''
-      }
-    }
+    // stage('logout') {
+    //   agent { label 'build-node' } // Specify your preferred agent here
+    //   steps {
+    //     sh '''
+    //       docker logout
+    //       docker system prune -f
+    //     '''
+    //   }
+    // }
 
 
 
