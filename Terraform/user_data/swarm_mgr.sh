@@ -31,32 +31,44 @@ sudo groupadd docker
 
 sudo usermod -aG docker $USER
 
+# install nginx
+sudo apt install -y nginx
+
+# modify nginx config
+
+# start and enable nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
 #  _ __  __ _ _ _ 
 # | '  \/ _` | '_|
 # |_|_|_\__, |_|  
 #       |___/     
 # swarm manager
-private_ip=$(hostname -i)
-docker swarm init --advertise-addr $private_ip
+private_ip=$(hostname -i | awk '{print $1; exit}')
+sudo docker swarm init --advertise-addr $private_ip
 # save token
-docker swarm join-token -q worker > worker.token
+sudo docker swarm join-token -q worker > worker.token
 
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 
 # create overlay network for services
-docker network create --driver overlay devnet
+sudo docker network create --driver overlay devnet
 
 # correctly format node_ips to ip-0-0-0-0 format
-frontend_ip="ip-${front_ip}//./-/g"
-backend_ip="ip-${back_ip}//./-/g" 
+frontend_ip="ip-${front_ip}"
+frontend_ip=$(echo $frontend_ip | sed 's/\./\-/g')
+
+backend_ip="ip-${back_ip}"
+backend_ip=$(echo $backend_ip | sed 's/\./\-/g')
 
 echo "frontend_ip: $frontend_ip"
 echo "backend_ip: $backend_ip"
