@@ -14,14 +14,12 @@ chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
 
 # chop up dev_key to make realkey
 cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f1-4 > /home/ubuntu/.ssh/realkey.pem
-
 tr ' ' '\n' < /home/ubuntu/.ssh/dev_key.pem | sed -n '5,29p' >> /home/ubuntu/.ssh/realkey.pem
-
-cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30- >> /home/ubuntu/.ssh/realkey.pem
+printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ubuntu/.ssh/realkey.pem
 
 # ensure pem status
 ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
-
+chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
 # ubuntu owner
 chmod 400 /home/ubuntu/.ssh/realkey.pem
 
