@@ -1,12 +1,25 @@
 #!/bin/bash
 
+# update system repos
 sudo apt update
 
+#        _    
+#  _____| |_  
+# (_-<_-< ' \ 
+# /__/__/_||_|
 # add ssh key for manager node to pass token to worker nodes
 echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
 ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/dev_key.pem
 chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
-chmod 400 /home/ubuntu/.ssh/dev_key.pem
+
+# chop up dev_key to make realkey
+cat .ssh/dev_key.pem | cut -d' ' -f-4 > /home/ubuntu/.ssh/realkey.pem
+tr ' ' '\n' < /home/ubuntu/.ssh/dev_key.pem | sed -n '5,29p' >> /home/ubuntu/.ssh/realkey.pem
+cat .ssh/dev_key.pem | cut -d' ' -f30- >> /home/ubuntu/.ssh/realkey.pem
+# ensure pem status
+ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
+# ubuntu owner
+chmod 400 /home/ubuntu/.ssh/realkey.pem
 
 #     _         _           
 #  __| |___  __| |_____ _ _ 
