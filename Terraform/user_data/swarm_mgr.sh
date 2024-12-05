@@ -4,6 +4,8 @@ sudo apt update
 
 # add ssh key for manager node to pass token to worker nodes
 echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
+ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/dev_key.pem
+chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
 chmod 400 /home/ubuntu/.ssh/dev_key.pem
 
 #     _         _           
@@ -31,10 +33,16 @@ sudo groupadd docker
 
 sudo usermod -aG docker $USER
 
+#            _          
+#  _ _  __ _(_)_ _ __ __
+# | ' \/ _` | | ' \\ \ /
+# |_||_\__, |_|_||_/_\_\
+#      |___/            
 # install nginx
 sudo apt install -y nginx
 
 # modify nginx config (/etc/nginx/sites-available/default)
+sudo sed -i '/location \/ {/,/}/c\    location / {\n        proxy_pass http://$frontend_ip:3000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $proxy_add_x_forwarded_for;\n    }' /etc/nginx/sites-enabled/default
 
 # start and enable nginx
 sudo systemctl start nginx
@@ -51,10 +59,10 @@ sudo docker swarm init --advertise-addr $private_ip
 sudo docker swarm join-token -q worker > worker.token
 
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem root@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/dev_key.pem root@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 # login to docker hub
@@ -91,3 +99,5 @@ sudo docker service create \
   --env XAI_KEY=${XAI_KEY} \
   --network devnet \
   cloudbandits/farseer_back:latest
+
+sudo systemctl restart nginx
