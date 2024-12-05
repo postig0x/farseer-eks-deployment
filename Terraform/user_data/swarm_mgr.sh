@@ -74,7 +74,7 @@ echo "frontend_ip: $frontend_ip"
 echo "backend_ip: $backend_ip"
 
 # create frontend service for frontend node
-docker service create \
+sudo docker service create \
   --name frontend \
   --replicas 1 \
   --constraint 'node.hostname == $frontend_ip' \
@@ -83,7 +83,7 @@ docker service create \
   cloudbandits/farseer_front:latest
 
 # create backend service for backend node
-docker service create \
+sudo docker service create \
   --name backend \
   --replicas 1 \
   --constraint 'node.hostname == $backend_ip' \
