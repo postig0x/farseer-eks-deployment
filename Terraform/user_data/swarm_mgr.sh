@@ -19,7 +19,7 @@ printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ub
 
 # ensure pem status
 ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
-chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
+chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
 # ubuntu owner
 chmod 400 /home/ubuntu/.ssh/realkey.pem
 
