@@ -85,13 +85,13 @@ sudo docker swarm join-token -q worker > worker.token
 
 echo "swarm manager init and token saved at worker.token"
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 sleep 3
 echo "slept 3 after ssh 1"
 
-ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "sudo docker swarm join \
+ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 sleep 3
