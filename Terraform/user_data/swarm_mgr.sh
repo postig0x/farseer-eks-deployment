@@ -19,8 +19,7 @@ printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ub
 
 # ensure pem status
 ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
-chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
-# ubuntu owner
+# perms
 chmod 400 /home/ubuntu/.ssh/realkey.pem
 
 #     _         _           
@@ -117,3 +116,12 @@ sudo docker service create \
   cloudbandits/farseer_back:latest
 
 sudo systemctl restart nginx
+
+#                        _   
+#  _____ ___ __  ___ _ _| |_ 
+# / -_) \ / '_ \/ _ \ '_|  _|
+# \___/_\_\ .__/\___/_|  \__|
+#         |_|                
+# ubuntu owner
+chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
+chmod 400 /home/ubuntu/.ssh/realkey.pem
