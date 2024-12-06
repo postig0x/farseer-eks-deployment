@@ -19,6 +19,8 @@ printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ub
 
 # ensure pem status
 ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
+# ubuntu owner
+chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
 # perms
 chmod 400 /home/ubuntu/.ssh/realkey.pem
 
@@ -122,6 +124,8 @@ sudo docker service create \
   --network devnet \
   cloudbandits/farseer_front:latest
 
+echo "frontend service created"
+
 # create backend service for backend node
 sudo docker service create \
   --name backend \
@@ -132,7 +136,7 @@ sudo docker service create \
   --network devnet \
   cloudbandits/farseer_back:latest
 
-echo "docker services created"
+echo "backend service created"
 
 sudo systemctl restart nginx
 sleep 10
@@ -143,5 +147,5 @@ sleep 10
 # \___/_\_\ .__/\___/_|  \__|
 #         |_|                
 # ubuntu owner
-chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
-chmod 400 /home/ubuntu/.ssh/realkey.pem
+# chown ubuntu:ubuntu /home/ubuntu/.ssh/realkey.pem
+# chmod 400 /home/ubuntu/.ssh/realkey.pem
