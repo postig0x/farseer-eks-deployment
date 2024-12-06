@@ -47,6 +47,8 @@ sudo groupadd docker
 
 sudo usermod -aG docker $USER
 
+sleep 3
+echo "slept 3"
 #            _          
 #  _ _  __ _(_)_ _ __ __
 # | ' \/ _` | | ' \\ \ /
@@ -55,12 +57,19 @@ sudo usermod -aG docker $USER
 # install nginx
 sudo apt install -y nginx
 
+sleep 3
+echo "slept 3 after installing nginx"
+
 # modify nginx config (/etc/nginx/sites-available/default)
 sudo sed -i '/location \/ {/,/}/c\    location / {\n        proxy_pass http://$frontend_ip:3000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $proxy_add_x_forwarded_for;\n    }' /etc/nginx/sites-enabled/default
+
+echo "nginx config modified"
 
 # start and enable nginx
 sudo systemctl start nginx
 sudo systemctl enable nginx
+
+echo "nginx started and enabled"
 
 #  _ __  __ _ _ _ 
 # | '  \/ _` | '_|
@@ -72,18 +81,26 @@ sudo docker swarm init --advertise-addr $private_ip
 # save token
 sudo docker swarm join-token -q worker > worker.token
 
+echo "swarm manager init and token saved at worker.token"
 
 ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
+sleep 3
+echo "slept 3 after ssh 1"
+
 ssh -i /home/ubuntu/.ssh/dev_key.pem ubuntu@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
+
+sleep 3
+echo "slept 3 after ssh 2"
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
 
 # create overlay network for services
 sudo docker network create --driver overlay devnet
+echo "docker network created"
 
 # format node IPs to ip-0-0-0-0 format
 # used for createing docker services
@@ -115,7 +132,10 @@ sudo docker service create \
   --network devnet \
   cloudbandits/farseer_back:latest
 
+echo "docker services created"
+
 sudo systemctl restart nginx
+sleep 10
 
 #                        _   
 #  _____ ___ __  ___ _ _| |_ 
