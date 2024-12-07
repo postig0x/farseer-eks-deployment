@@ -31,7 +31,5 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 sleep 1
 echo "sleeping.."
-sudo usermod -aG docker jenkins
-echo "sleeping.."
 sleep 1
 sudo usermod -aG docker ubuntu
