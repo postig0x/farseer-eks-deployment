@@ -172,6 +172,9 @@ resource "aws_instance" "bastion" {
     XAI_KEY = var.xai_key
   })
   depends_on = [aws_instance.frontend, aws_instance.backend]
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = {
     Name = "${var.environment}-bastion"
   }
@@ -185,7 +188,9 @@ resource "aws_instance" "frontend" {
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.key_name
   user_data              = file("${path.root}/../user_data/swarm_node.sh")
-
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = {
     Name = "${var.environment}-frontend"
   }
@@ -198,7 +203,9 @@ resource "aws_instance" "backend" {
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.key_name
   user_data              = file("${path.root}/../user_data/swarm_node.sh")
-
+  lifecycle {
+    create_before_destroy = true
+  }
   tags = {
     Name = "${var.environment}-backend"
   }
