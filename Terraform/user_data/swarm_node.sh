@@ -1,9 +1,9 @@
 #!/bin/bash
 sudo apt update
 
-SSH_PUBKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaBSpmz07+rUAG//8rrPxDztMN3a9yGCuzDGseWlUi1IuPcXflCeQoOhQZsVExxxHaRgtP8BU/U/6ETbk6fqbFRge5iT7xp28sqWLaBF9bv3RbSpZOrVunNwn2v6eZCXwulMn53YtdUZRHJlquf7keKwhqDWTF4RhGdret+5qQNCC6VaiMsYXkwLayxwrupz7X75SIovHcw+zkby/jF/woSDtzY9OjAAuIQXljpOwvCHYneHRSxhmY7Ca1X7dXgREVz51LSXf1SzbryTF5cGSRBFElg4bEi6uthUeveTaduy3WD0dI5hdQpjFJBcCVWWyyS2TKH0KxXISXIO48y05n"
+# SSH_PUBKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaBSpmz07+rUAG//8rrPxDztMN3a9yGCuzDGseWlUi1IuPcXflCeQoOhQZsVExxxHaRgtP8BU/U/6ETbk6fqbFRge5iT7xp28sqWLaBF9bv3RbSpZOrVunNwn2v6eZCXwulMn53YtdUZRHJlquf7keKwhqDWTF4RhGdret+5qQNCC6VaiMsYXkwLayxwrupz7X75SIovHcw+zkby/jF/woSDtzY9OjAAuIQXljpOwvCHYneHRSxhmY7Ca1X7dXgREVz51LSXf1SzbryTF5cGSRBFElg4bEi6uthUeveTaduy3WD0dI5hdQpjFJBcCVWWyyS2TKH0KxXISXIO48y05n"
 
-echo "$SSH_PUBKEY" >> /home/ubuntu/.ssh/authorized_keys
+# echo "$SSH_PUBKEY" >> /home/ubuntu/.ssh/authorized_keys
 
 #     _         _           
 #  __| |___  __| |_____ _ _ 
@@ -29,3 +29,9 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo groupadd docker
 
 sudo usermod -aG docker $USER
+sleep 1
+echo "sleeping.."
+sudo usermod -aG docker jenkins
+echo "sleeping.."
+sleep 1
+sudo usermod -aG docker ubuntu

@@ -7,21 +7,23 @@ sudo apt update
 #  _____| |_  
 # (_-<_-< ' \ 
 # /__/__/_||_|
-# add ssh key for manager node to pass token to worker nodes
-echo "${dev_key}" > /home/ubuntu/.ssh/dev_key.pem
-ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/dev_key.pem
-chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
+# # add ssh key for manager node to pass token to worker nodes
+echo "${ssh_private_key}" > /home/ubuntu/.ssh/${key_name}.pem # Changed from dev_key import from Jenkins to use terraform generated EC2 SSH key
+# ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/dev_key.pem
+# chown ubuntu:ubuntu /home/ubuntu/.ssh/dev_key.pem
+chown ubuntu:ubuntu /home/ubuntu/.ssh/${key_name}.pem
+chmod 400 /home/ubuntu/.ssh/${key_name}.pem
 
-# chop up dev_key to make realkey
-cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f1-4 > /home/ubuntu/.ssh/realkey.pem
-tr ' ' '\n' < /home/ubuntu/.ssh/dev_key.pem | sed -n '5,29p' >> /home/ubuntu/.ssh/realkey.pem
-printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ubuntu/.ssh/realkey.pem
+# # chop up dev_key to make realkey
+# cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f1-4 > /home/ubuntu/.ssh/realkey.pem
+# tr ' ' '\n' < /home/ubuntu/.ssh/dev_key.pem | sed -n '5,29p' >> /home/ubuntu/.ssh/realkey.pem
+# printf "%s" "$(cat /home/ubuntu/.ssh/dev_key.pem | cut -d' ' -f30-)" >> /home/ubuntu/.ssh/realkey.pem
 
-# ensure pem status
-ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
+# # ensure pem status
+# ssh-keygen -p -m PEM -f /home/ubuntu/.ssh/realkey.pem
 
-# perms
-chmod 400 /home/ubuntu/.ssh/realkey.pem
+# # perms
+# chmod 400 /home/ubuntu/.ssh/realkey.pem
 
 #     _         _           
 #  __| |___  __| |_____ _ _ 
@@ -47,6 +49,12 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo groupadd docker
 
 sudo usermod -aG docker $USER
+sleep 1
+echo "sleeping.."
+sudo usermod -aG docker jenkins
+echo "sleeping.."
+sleep 1
+sudo usermod -aG docker ubuntu
 
 sleep 3
 echo "slept 3"
@@ -77,18 +85,20 @@ echo "nginx started and enabled"
 # |_|_|_\__, |_|  
 #       |___/     
 # swarm manager
-private_ip=$(hostname -i | awk '{print $1; exit}')
-sudo docker swarm init --advertise-addr $private_ip
+# private_ip=$(hostname -i | awk '{print $1; exit}') #Don't need this because we can grab Bastion host Private IP via Terraform object.
+sudo docker swarm init --advertise-addr ${private_ip}
 # save token
-sudo docker swarm join-token -q worker > worker.token
+sudo docker swarm join-token -q worker > /home/ubuntu/worker.token
+echo "swarm manager init and token saved at /home/ubuntu/worker.token"
 
-echo "swarm manager init and token saved at worker.token"
+echo "exporting worker token to use on worker nodes"
+export WORKER_TOKEN = $(cat /home/ubuntu/worker.token)
 
 echo "Adding Frontend Private IP to known_hosts file."
 ssh-keyscan -H ${front_ip} >> ~/.ssh/known_hosts
 
-ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${front_ip}" "sudo docker swarm join \
-    --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
+ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${front_ip}" "sudo docker swarm join \
+    --token $WORKER_TOKEN \"${private_ip}:2377\""
 
 sleep 3
 echo "slept 3 after ssh 1"
@@ -96,8 +106,8 @@ echo "slept 3 after ssh 1"
 echo "Adding Backend Private IP to known_hosts file."
 ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
-ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${back_ip}" "sudo docker swarm join \
-    --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
+ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${back_ip}" "sudo docker swarm join \
+    --token $WORKER_TOKEN \"${private_ip}:2377\""
 
 sleep 3
 echo "slept 3 after ssh 2"

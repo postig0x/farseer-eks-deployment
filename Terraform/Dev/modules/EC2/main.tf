@@ -48,10 +48,25 @@ resource "aws_security_group" "frontend_sg" {
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/24"]
   }
+
+  # ingress {
+  #   from_port   = 2377
+  #   to_port     = 2377
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
+
   ingress {
-    from_port   = 2377
-    to_port     = 2377
+    from_port   = 7946
+    to_port     = 7946
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 4789
+    to_port     = 4789
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -91,10 +106,26 @@ resource "aws_security_group" "backend_sg" {
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/24"]
   }
+
+  # # Cluster management port
+  # ingress {
+  #   from_port   = 2377
+  #   to_port     = 2377
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
+
   ingress {
-    from_port   = 2377
-    to_port     = 2377
+    from_port   = 7946
+    to_port     = 7946
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 4789
+    to_port     = 4789
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -164,17 +195,25 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
   user_data              = templatefile("${path.root}/../user_data/swarm_mgr.sh", {
+    private_ip = "${aws_instance.bastion.private_ip}"
     front_ip = "${aws_instance.backend.private_ip}",
     back_ip = "${aws_instance.frontend.private_ip}",
-    dev_key = var.dev_key,
+    # dev_key = var.dev_key,
+    key_name = "${var.key_name}"
+    ssh_private_key = "${tls_private_key.generated_key.private_key_pem}"
     DOCKER_CREDS_USR = var.docker_usr,
     DOCKER_CREDS_PSW = var.docker_psw,
     XAI_KEY = var.xai_key
   })
-  depends_on = [aws_instance.frontend, aws_instance.backend]
+  depends_on = [
+    aws_instance.frontend,
+    aws_instance.backend
+  ]
+
   lifecycle {
     create_before_destroy = true
   }
+
   tags = {
     Name = "${var.environment}-bastion"
   }
@@ -187,7 +226,9 @@ resource "aws_instance" "frontend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh")
+  user_data              = file("${path.root}/../user_data/swarm_node.sh", {
+
+  })
   lifecycle {
     create_before_destroy = true
   }
@@ -202,7 +243,9 @@ resource "aws_instance" "backend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh")
+  user_data              = file("${path.root}/../user_data/swarm_node.sh", {
+
+  })
   lifecycle {
     create_before_destroy = true
   }

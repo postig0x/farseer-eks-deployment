@@ -31,9 +31,9 @@ variable "key_name" {
   default = "dev-ssh-key"
 }
 
-variable "dev_key" {
-  sensitive = true
-}
+# variable "dev_key" {
+#   sensitive = true
+# }
 
 variable "XAI_KEY" {
   type = string

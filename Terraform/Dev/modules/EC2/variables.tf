@@ -18,7 +18,7 @@ variable "vpc_id" {}
 variable "public_subnet_id" {}
 
 variable "private_subnet_id" {}
-variable "dev_key" {}
+#variable "dev_key" {}
 variable "docker_usr"{}
 variable "docker_psw" {}
 variable "xai_key" {}
