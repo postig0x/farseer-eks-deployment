@@ -85,8 +85,8 @@ echo "nginx started and enabled"
 # |_|_|_\__, |_|  
 #       |___/     
 # swarm manager
-# private_ip=$(hostname -i | awk '{print $1; exit}') #Don't need this because we can grab Bastion host Private IP via Terraform object.
-sudo docker swarm init --advertise-addr ${private_ip}
+private_ip=$(hostname -i | awk '{print $1; exit}')
+sudo docker swarm init --advertise-addr "$private_ip"
 # save token
 sudo docker swarm join-token -q worker > /home/ubuntu/worker.token
 echo "swarm manager init and token saved at /home/ubuntu/worker.token"
@@ -98,7 +98,7 @@ echo "Adding Frontend Private IP to known_hosts file."
 ssh-keyscan -H ${front_ip} >> ~/.ssh/known_hosts
 
 ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${front_ip}" "sudo docker swarm join \
-    --token $WORKER_TOKEN \"${private_ip}:2377\""
+    --token $WORKER_TOKEN \"$private_ip:2377\""
 
 sleep 3
 echo "slept 3 after ssh 1"
@@ -107,7 +107,7 @@ echo "Adding Backend Private IP to known_hosts file."
 ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
 ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${back_ip}" "sudo docker swarm join \
-    --token $WORKER_TOKEN \"${private_ip}:2377\""
+    --token $WORKER_TOKEN \"$private_ip:2377\""
 
 sleep 3
 echo "slept 3 after ssh 2"
