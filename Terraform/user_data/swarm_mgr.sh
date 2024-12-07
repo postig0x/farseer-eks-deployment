@@ -84,11 +84,17 @@ sudo docker swarm join-token -q worker > worker.token
 
 echo "swarm manager init and token saved at worker.token"
 
+echo "Adding Frontend Private IP to known_hosts file."
+ssh-keyscan -H ${front_ip} >> ~/.ssh/known_hosts
+
 ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${front_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
 
 sleep 3
 echo "slept 3 after ssh 1"
+
+echo "Adding Backend Private IP to known_hosts file."
+ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
 ssh -i /home/ubuntu/.ssh/realkey.pem ubuntu@"${back_ip}" "sudo docker swarm join \
     --token \$(cat /home/ubuntu/worker.token) \"$private_ip\":2377"
