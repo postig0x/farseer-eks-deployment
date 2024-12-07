@@ -226,9 +226,7 @@ resource "aws_instance" "frontend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh", {
-
-  })
+  user_data              = file("${path.root}/../user_data/swarm_node.sh")
   lifecycle {
     create_before_destroy = true
   }
@@ -243,9 +241,7 @@ resource "aws_instance" "backend" {
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh", {
-
-  })
+  user_data              = file("${path.root}/../user_data/swarm_node.sh")
   lifecycle {
     create_before_destroy = true
   }
