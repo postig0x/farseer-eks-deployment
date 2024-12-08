@@ -99,6 +99,16 @@ pipeline {
                           terraform apply -auto-approve
                         '''
                     }
+                } else if (env.BRANCH_NAME == 'qa-eks-test') {
+                    echo "Deploying to Testing Environment"
+                    dir('Terraform/QA') { // Navigate to the qa environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
+                    }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
