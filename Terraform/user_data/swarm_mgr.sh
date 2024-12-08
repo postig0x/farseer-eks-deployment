@@ -71,7 +71,7 @@ sudo apt install -y nginx
 
 sleep 3
 echo "slept 3 after installing nginx"
-
+cp /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/default.bkp
 # modify nginx config (/etc/nginx/sites-enabled/default)
 sudo sed -i "/location \/ {/,/}/c\    location / {\n        proxy_pass http://${front_ip}:3000;\n        proxy_set_header Host \$host;\n        proxy_set_header X-Real-IP \$proxy_add_x_forwarded_for;\n    }" /etc/nginx/sites-enabled/default
 
@@ -109,16 +109,17 @@ echo "Adding Backend Private IP to known_hosts file."
 ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 ssh-keyscan -H "${back_ip}" >> /home/ubuntu/.ssh/known_hosts
 
-sleep 10
+sleep 30
 
-echo "slept 10 after keyscan for frontend and backend"
+echo "slept 30 after keyscan for frontend and backend"
+echo "waiting for frontend and backend instances to finish set up"
 
-ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 1"
 
-ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 2"
