@@ -107,8 +107,7 @@ ssh-keyscan -H "${front_ip}" >> ~/.ssh/known_hosts
 
 sleep 2
 
-ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join \
-    --token "$WORKER_TOKEN" \"$private_ip:2377\""
+ssh -vvv -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
 
 sleep 3
 echo "slept 3 after ssh 1"
@@ -118,8 +117,7 @@ ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
 sleep 2
 
-ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join \
-    --token "$WORKER_TOKEN" \"$private_ip:2377\""
+ssh -vvv -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
 
 sleep 3
 echo "slept 3 after ssh 2"
