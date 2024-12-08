@@ -103,24 +103,22 @@ sleep 5
 
 echo "Adding Frontend Private IP to known_hosts file."
 ssh-keyscan -H "${front_ip}" >> ~/.ssh/known_hosts
+ssh-keyscan -H "${front_ip}" >> /home/ubuntu/.ssh/known_hosts
 
-sleep 5
+echo "Adding Backend Private IP to known_hosts file."
+ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
+ssh-keyscan -H "${back_ip}" >> /home/ubuntu/.ssh/known_hosts
 
-echo "slept 5 after keyscan 1"
+sleep 10
 
-ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
+echo "slept 10 after keyscan for frontend and backend"
+
+ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 1"
 
-echo "Adding Backend Private IP to known_hosts file."
-ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
-
-sleep 5
-echo "slept 5 after keyscan 2"
-
-
-ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
+ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 2"
