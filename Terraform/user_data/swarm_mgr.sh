@@ -114,12 +114,12 @@ sleep 30
 echo "slept 30 after keyscan for frontend and backend"
 echo "waiting for frontend and backend instances to finish set up"
 
-ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 1"
 
-ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "sudo docker swarm join --token $WORKER_TOKEN $private_ip:2377"
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377"
 
 sleep 5
 echo "slept 5 after ssh 2"

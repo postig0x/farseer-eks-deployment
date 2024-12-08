@@ -33,7 +33,8 @@ sleep 1
 echo "sleeping.."
 sleep 1
 sudo usermod -aG docker ubuntu
-
+echo "added ${USER} and ubuntu to docker group"
+sleep 1
 newgrp docker
 
 groups root
