@@ -1,12 +1,33 @@
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os
 import ell
 from openai import OpenAI
 
-load_dotenv()
-KEY = os.getenv("XAI_KEY")
+# load_dotenv()
+# KEY = os.getenv("XAI_KEY")
+
+def get_api_key(key_name: str) -> str:
+    # Read the key in from a file named <key_name>.
+    # Kubernetes will automatically mount secrets into a shared volume at:
+    # /var/run/secrets/<secret-name>.
+    # If a name is not specified for the secret in apiVersion v1,
+    # then the secret will be mounted under
+    # /var/run/secrets/kubernetes.io/serviceaccount
+    try:
+        with open(
+            f"/var/run/secrets/my-api-key/{key_name}", "r"
+        ) as f:  # Kubernetes mounts secrets here
+            api_key = f.readline().strip()  # read the value
+    except FileNotFoundError:
+        api_key = os.environ.get(key_name)  # Fallback for local development ONLY
+        if not api_key:
+            raise ValueError(f"API key not found. Set {key_name} for local development.")
+
+    return api_key
+
+KEY = get_api_key("XAI_KEY")
 
 api_router = APIRouter()
 
