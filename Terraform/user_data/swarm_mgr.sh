@@ -102,27 +102,31 @@ echo "swarm manager init and token saved at /home/ubuntu/worker.token"
 echo "exporting worker token to use on worker nodes"
 export WORKER_TOKEN=$(cat /home/ubuntu/worker.token)
 
-sleep 3
+sleep 5
 
 echo "Adding Frontend Private IP to known_hosts file."
 ssh-keyscan -H "${front_ip}" >> ~/.ssh/known_hosts
 
-sleep 2
+sleep 5
 
-ssh -vvv -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
+echo "slept 5 after keyscan 1"
 
-sleep 3
-echo "slept 3 after ssh 1"
+ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
+
+sleep 5
+echo "slept 5 after ssh 1"
 
 echo "Adding Backend Private IP to known_hosts file."
 ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
-sleep 2
+sleep 5
+echo "slept 5 after keyscan 2"
 
-ssh -vvv -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
 
-sleep 3
-echo "slept 3 after ssh 2"
+ssh -v -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join --token $WORKER_TOKEN $private_ip:2377" >> /home/ubuntu/debug.log 2>&1
+
+sleep 5
+echo "slept 5 after ssh 2"
 
 # login to docker hub
 echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin
