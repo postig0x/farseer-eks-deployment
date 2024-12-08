@@ -134,7 +134,7 @@ echo "backend_ip: $backend_ip"
 sudo docker service create \
   --name frontend \
   --replicas 1 \
-  --constraint 'node.hostname == $frontend_ip' \
+  --constraint node.hostname==$frontend_ip \
   --publish published=3000,target=3000 \
   --network devnet \
   cloudbandits/farseer_front:latest
@@ -145,7 +145,7 @@ echo "frontend service created"
 sudo docker service create \
   --name backend \
   --replicas 1 \
-  --constraint 'node.hostname == $backend_ip' \
+  --constraint node.hostname==$backend_ip \
   --publish published=8000,target=8000 \
   --env XAI_KEY=${XAI_KEY} \
   --network devnet \
