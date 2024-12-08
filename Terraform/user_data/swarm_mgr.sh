@@ -94,8 +94,12 @@ echo "swarm manager init and token saved at /home/ubuntu/worker.token"
 echo "exporting worker token to use on worker nodes"
 export WORKER_TOKEN=$(cat /home/ubuntu/worker.token)
 
+sleep 3
+
 echo "Adding Frontend Private IP to known_hosts file."
 ssh-keyscan -H ${front_ip} >> ~/.ssh/known_hosts
+
+sleep 2
 
 ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${front_ip}" "docker swarm join \
     --token $WORKER_TOKEN \"$private_ip:2377\""
@@ -105,6 +109,8 @@ echo "slept 3 after ssh 1"
 
 echo "Adding Backend Private IP to known_hosts file."
 ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
+
+sleep 2
 
 ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${back_ip}" "docker swarm join \
     --token $WORKER_TOKEN \"$private_ip:2377\""
@@ -134,7 +140,7 @@ echo "backend_ip: $backend_ip"
 sudo docker service create \
   --name frontend \
   --replicas 1 \
-  --constraint node.hostname==$frontend_ip \
+  --constraint "node.hostname==$frontend_ip" \
   --publish published=3000,target=3000 \
   --network devnet \
   cloudbandits/farseer_front:latest
@@ -145,7 +151,7 @@ echo "frontend service created"
 sudo docker service create \
   --name backend \
   --replicas 1 \
-  --constraint node.hostname==$backend_ip \
+  --constraint "node.hostname==$backend_ip" \
   --publish published=8000,target=8000 \
   --env XAI_KEY=${XAI_KEY} \
   --network devnet \
