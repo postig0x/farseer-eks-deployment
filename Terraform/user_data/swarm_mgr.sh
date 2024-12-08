@@ -70,13 +70,13 @@ sleep 3
 echo "slept 3 after installing nginx"
 
 # modify nginx config (/etc/nginx/sites-available/default)
-sudo sed -i '/location \/ {/,/}/c\    location / {\n        proxy_pass http://$frontend_ip:3000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $proxy_add_x_forwarded_for;\n    }' /etc/nginx/sites-enabled/default
+# sudo sed -i "/location \/ {/,/}/c\    location / {\n        proxy_pass http://${front_ip}:3000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $proxy_add_x_forwarded_for;\n    }" /etc/nginx/sites-enabled/default
 
 echo "nginx config modified"
 
 # start and enable nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
+# sudo systemctl start nginx
+# sudo systemctl enable nginx
 
 echo "nginx started and enabled"
 
