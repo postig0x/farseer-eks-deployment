@@ -54,6 +54,9 @@ echo "sleeping.."
 sleep 1
 sudo usermod -aG docker ubuntu
 
+groups root
+groups ubuntu
+
 sleep 3
 echo "slept 3"
 #            _          
