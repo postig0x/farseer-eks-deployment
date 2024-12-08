@@ -51,8 +51,6 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 sleep 1
 echo "sleeping.."
-sudo usermod -aG docker jenkins
-echo "sleeping.."
 sleep 1
 sudo usermod -aG docker ubuntu
 
@@ -102,12 +100,12 @@ export WORKER_TOKEN=$(cat /home/ubuntu/worker.token)
 sleep 3
 
 echo "Adding Frontend Private IP to known_hosts file."
-ssh-keyscan -H ${front_ip} >> ~/.ssh/known_hosts
+ssh-keyscan -H "${front_ip}" >> ~/.ssh/known_hosts
 
 sleep 2
 
-ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${front_ip}" "docker swarm join \
-    --token $WORKER_TOKEN \"$private_ip:2377\""
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${front_ip}" "docker swarm join \
+    --token "$WORKER_TOKEN" \"$private_ip:2377\""
 
 sleep 3
 echo "slept 3 after ssh 1"
@@ -117,8 +115,8 @@ ssh-keyscan -H ${back_ip} >> ~/.ssh/known_hosts
 
 sleep 2
 
-ssh -i /home/ubuntu/.ssh/${key_name}.pem ubuntu@"${back_ip}" "docker swarm join \
-    --token $WORKER_TOKEN \"$private_ip:2377\""
+ssh -i /home/ubuntu/.ssh/"${key_name}".pem ubuntu@"${back_ip}" "docker swarm join \
+    --token "$WORKER_TOKEN" \"$private_ip:2377\""
 
 sleep 3
 echo "slept 3 after ssh 2"
