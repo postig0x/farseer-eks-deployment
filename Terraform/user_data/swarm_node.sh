@@ -33,3 +33,5 @@ sleep 1
 echo "sleeping.."
 sleep 1
 sudo usermod -aG docker ubuntu
+
+newgrp docker
