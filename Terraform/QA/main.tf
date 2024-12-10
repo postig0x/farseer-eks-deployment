@@ -133,3 +133,22 @@ resource "aws_iam_policy_attachment" "aws_load_balancer_policy_attachment" {
 #     }
 #   }
 # }
+
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "default"
+  }
+
+  data = {
+    mapRoles = yamlencode([
+      {
+        rolearn  = aws_iam_role.aws_load_balancer_controller_role.name
+        username = "qa-eks-load-balancer-controller"
+        groups   = ["system:masters"]  # Grants admin access; adjust as needed
+      }
+    ])
+  }
+
+  depends_on = [module.eks]
+}
