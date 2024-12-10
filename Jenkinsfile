@@ -114,7 +114,6 @@ pipeline {
                           aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
 
                           # test connection
-                          sleep 180
                           echo "describe cluster"
                           aws eks describe-cluster --name qa-eks-cluster --region us-east-1
                           echo "testing connection"
