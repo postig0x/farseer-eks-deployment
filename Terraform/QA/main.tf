@@ -123,13 +123,13 @@ resource "aws_iam_policy_attachment" "aws_load_balancer_policy_attachment" {
 }
 
 # Create Kubernetes Service Account and Annotate with IAM Role ARN
-resource "kubernetes_service_account" "aws_load_balancer_controller_sa" {
-  depends_on = [ time_sleep.wait_eks ]
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.aws_load_balancer_controller_role.arn
-    }
-  }
-}
+# resource "kubernetes_service_account" "aws_load_balancer_controller_sa" {
+#   depends_on = [ time_sleep.wait_eks ]
+#   metadata {
+#     name      = "aws-load-balancer-controller"
+#     namespace = "kube-system"
+#     annotations = {
+#       "eks.amazonaws.com/role-arn" = aws_iam_role.aws_load_balancer_controller_role.arn
+#     }
+#   }
+# }

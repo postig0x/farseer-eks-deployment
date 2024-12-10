@@ -125,6 +125,13 @@ pipeline {
                             --from-literal=XAI_KEY=${XAI_KEY} \
                             --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
+                          # Get the IAM role ARN and annotate the service account
+                          ROLE_ARN=$(terraform output -raw aws_load_balancer_controller_role_arn || aws_iam_role.aws_load_balancer_controller_role.arn)
+                          kubectl annotate serviceaccount aws-load-balancer-controller \
+                            -n kube-system \
+                            eks.amazonaws.com/role-arn=$ROLE_ARN \
+                            --overwrite
+
 
                           # deploy k8s resources
                           echo "deploying k8s resources"
