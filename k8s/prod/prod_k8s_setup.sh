@@ -2,6 +2,9 @@
 
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 
+# Creating the nodegroup for the cluster
+eksctl create nodegroup --cluster prod-eks-cluster --name prod-eks-nodegroup --node-type t3.micro --nodes 2 --nodes-min 1 --nodes-max 10
+
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=prod-eks-cluster --approve
 
