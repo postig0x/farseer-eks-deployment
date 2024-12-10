@@ -1,5 +1,6 @@
 #!/bin/bash
 
+XAI_KEY="$1"
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 
 # Creating the nodegroup for the cluster
@@ -36,7 +37,7 @@ kubectl apply -f k8s/self_signed_issuer.yaml
 sleep 10
 
 # Apply the main controller configuration
-kubectl apply -f k8s/prod_v2_4_7_full.yaml
+kubectl apply -f k8s/prod/prod_v2_4_7_full.yaml
 
 # Wait for the certificate to be ready
 echo "Waiting for AWS Load Balancer Controller certificate..."
@@ -50,15 +51,15 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balanc
 kubectl apply -f k8s/ingress_class.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/frontend-deployment.yaml
-kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/prod/frontend-deployment.yaml
+kubectl apply -f k8s/prod/backend-deployment.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/frontend-service.yaml
-kubectl apply -f k8s/backend-service.yaml
+kubectl apply -f k8s/prod/frontend-service.yaml
+kubectl apply -f k8s/prod/backend-service.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/ingress.yaml
+kubectl apply -f k8s/prod/frontend-ingress.yaml
 sleep 60  # Increased delay for ingress to be processed
 
 # Wait and get Load Balancer DNS Name

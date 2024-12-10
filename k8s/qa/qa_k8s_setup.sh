@@ -42,7 +42,7 @@ kubectl apply -f k8s/self_signed_issuer.yaml
 sleep 10
 
 # Apply the main controller configuration
-kubectl apply -f k8s/qa_v2_4_7_full.yaml
+kubectl apply -f k8s/qa/qa_v2_4_7_full.yaml
 
 # Wait for the certificate to be ready
 echo "Waiting for AWS Load Balancer Controller certificate..."
@@ -56,15 +56,15 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balanc
 kubectl apply -f k8s/ingress_class.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/frontend-deployment.yaml
-kubectl apply -f k8s/backend-deployment.yaml
+kubectl apply -f k8s/qa/frontend-deployment.yaml
+kubectl apply -f k8s/qa/backend-deployment.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/frontend-service.yaml
-kubectl apply -f k8s/backend-service.yaml
+kubectl apply -f k8s/qa/frontend-service.yaml
+kubectl apply -f k8s/qa/backend-service.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/ingress.yaml
+kubectl apply -f k8s/qa/frontend-ingress.yaml
 sleep 60  # Increased delay for ingress to be processed
 
 
