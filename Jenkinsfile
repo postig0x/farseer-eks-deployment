@@ -108,7 +108,7 @@ pipeline {
                           echo "terraform init + apply"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform destroy -auto-approve
 
                           # configure kubectl
                           echo "configuring kubectl"
