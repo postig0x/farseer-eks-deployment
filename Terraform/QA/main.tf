@@ -7,29 +7,20 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args = [
-      "eks", "get-token", "--cluster-name", module.eks.cluster_name
-    ]
-  }
-}
+# provider "kubernetes" {
+#   host                   = aws_eks_cluster.cluster.endpoint
+#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+#   token                  = data.aws_eks_cluster_auth.cluster.token
+#   exec {
+#     api_version = "client.authentication.k8s.io/v1beta1"
+#     command     = "aws"
+#     args = [
+#       "eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id
+#     ]
+#   }
+# }
 
 data "aws_caller_identity" "current" {}
-
-resource "time_sleep" "wait_eks" {
-  depends_on      = [module.eks]
-  create_duration = "60s"
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-}
 
 module "VPC" {
   source      = "./modules/VPC"
