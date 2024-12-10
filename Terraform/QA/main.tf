@@ -38,3 +38,28 @@ module ALB{
     frontend2 = module.EC2.frontend2
     vpc_id = module.VPC.vpc_id
 }
+
+module "eks" {
+  source = "terraform-aws-modules/eks/aws"
+  cluster_name = "${var.environment}-eks-cluster"
+  cluster_version = "1.27"
+  subnet_ids = [
+    module.VPC.private_subnet_id1,
+    module.VPC.private_subnet_id2,
+    module.VPC.private_subnet_id3,
+    module.VPC.private_subnet_id4
+    ]
+    vpc_id = module.VPC.vpc_id
+    tags = {
+    Name = "${var.environment}-eks-cluster"
+  }
+  eks_managed_node_groups = {
+    default = {
+      min_size     = 1
+      max_size     = 3
+      desired_size = 1
+      # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
+      instance_types = ["t3.micro"]
+    }
+  }
+}

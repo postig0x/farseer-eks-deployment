@@ -104,9 +104,50 @@ pipeline {
                     dir('Terraform/QA') { // Navigate to the qa environment directory
                         sh '''
                           echo "Current working directory:"
+                          echo "terraform init + apply"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform apply -auto-approve \
+                            -var dev_key="${DEV_KEY}" \
+                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
+                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}"
+
+                          # configure kubectl
+                          echo "configuring kubectl"
+                          aws eks --region us-east-1 update-kubeconfig --name qa-test-eks-cluster
+
+                          # create xai key secret from secrets yaml
+                          kubectl create secret generic farseer-secret \
+                            --from-literal=XAI_KEY=${XAI_KEY} \
+                            --dry-run=client -o yaml | kubectl apply -f -
+
+
+                          # deploy k8s resources
+                          echo "deploying k8s resources"
+                          kubectl apply -f k8s/backend-deployment.yaml
+                          kubectl apply -f k8s/backend-service.yaml
+                          kubectl apply -f k8s/frontend-deployment.yaml
+                          kubectl apply -f k8s/frontend-service.yaml
+                          kubectl apply -f k8s/frontend-ingress.yaml
+
+                          # wait for deployments to complete
+                          echo "waiting for deployments to complete"
+                          kubectl wait --for=condition=available --timeout=600s deployment/backend
+                          kubectl wait --for=condition=available --timeout=600s deployment/frontend
+
+                          # verify deployments
+                          echo "verifying deployments"
+                          kubectl get nodes
+                          kubectl get pods
+                          kubectl get services
+                          kubectl get ingress
+
+                          # check if all pods are running
+                          echo "checking if all pods are running"
+                          if kubectl get pods | grep -v Running | grep -v Completed | grep -v NAME; then
+                            echo "pods are not running"
+                            exit 1
+                          fi
                         '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
