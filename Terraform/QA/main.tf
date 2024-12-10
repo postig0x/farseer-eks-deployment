@@ -81,33 +81,33 @@ resource "aws_eks_cluster" "cluster" {
   }
 }
 
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = aws_eks_cluster.cluster.id
-  cluster_version = aws_eks_cluster.cluster.version
+# module "eks" {
+#   source          = "terraform-aws-modules/eks/aws"
+#   cluster_name    = aws_eks_cluster.cluster.id
+#   cluster_version = aws_eks_cluster.cluster.version
 
-  cluster_endpoint_public_access = true
-  # Adds the current caller identity as an administrator via cluster access entry
-  enable_cluster_creator_admin_permissions = true
-  authentication_mode                      = "API_AND_CONFIG_MAP"
+#   cluster_endpoint_public_access = true
+#   # Adds the current caller identity as an administrator via cluster access entry
+#   enable_cluster_creator_admin_permissions = true
+#   authentication_mode                      = "API_AND_CONFIG_MAP"
 
 
-  # enable_irsa = true
-  eks_managed_node_groups = {
-    default = {
-      # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
-      instance_types = ["t3.micro"]
-      min_size       = 1
-      max_size       = 6
-      desired_size   = 4
-      iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup"
-    }
-  }
+#   # enable_irsa = true
+#   eks_managed_node_groups = {
+#     default = {
+#       # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
+#       instance_types = ["t3.micro"]
+#       min_size       = 1
+#       max_size       = 6
+#       desired_size   = 4
+#       iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup"
+#     }
+#   }
 
-  tags = {
-    Name = "${var.environment}-eks-cluster"
-  }
-}
+#   tags = {
+#     Name = "${var.environment}-eks-cluster"
+#   }
+# }
 
 # # Create the IAM Role for AWS Load Balancer Controller
 # resource "aws_iam_role" "aws_load_balancer_controller_role" {
