@@ -79,6 +79,8 @@ module "eks" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 # Create the IAM Role for AWS Load Balancer Controller
 resource "aws_iam_role" "aws_load_balancer_controller_role" {
   name               = "aws-load-balancer-controller-role"
