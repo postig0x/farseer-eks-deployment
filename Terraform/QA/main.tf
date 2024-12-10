@@ -51,6 +51,35 @@ module "VPC" {
 #     frontend2 = module.EC2.frontend2
 #     vpc_id = module.VPC.vpc_id
 # }
+
+resource "aws_iam_role" "cluster_role" {
+  name = "${var.environment}-eks-cluster-servicerole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Principal = {
+          Service = "eks.amazonaws.com"
+        }
+        Effect    = "Allow"
+        Sid       = ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy_attachment" {
+  role       = aws_iam_role.cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_vpc_resource_policy_attachment" {
+  role       = aws_iam_role.cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+}
+
 resource "aws_eks_cluster" "cluster" {
   name = "${var.environment}-eks-cluster"
 
@@ -58,7 +87,7 @@ resource "aws_eks_cluster" "cluster" {
     authentication_mode = "API_AND_CONFIG_MAP"
   }
 
-  role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS"
+  role_arn = aws_iam_role.cluster_role.arn
   version  = "1.31"
 
   vpc_config {
