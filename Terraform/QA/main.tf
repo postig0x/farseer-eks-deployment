@@ -44,13 +44,6 @@ module "eks" {
   cluster_name = "${var.environment}-eks-cluster"
   cluster_version = "1.27"
 
-  cluster_addons = {
-    coredns = {}
-    eks-pod-identity-agent = {}
-    kube-proxy = {}
-    vpc-cni = {}
-  }
-
   cluster_endpoint_public_access = true
 
   vpc_id = module.VPC.vpc_id
