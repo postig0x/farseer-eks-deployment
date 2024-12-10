@@ -100,12 +100,6 @@ module "eks" {
       min_size       = 1
       max_size       = 6
       desired_size   = 4
-      subnet_ids = [
-        module.VPC.private_subnet_id1,
-        module.VPC.private_subnet_id2,
-        module.VPC.private_subnet_id3,
-        module.VPC.private_subnet_id4
-      ]
       iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup"
     }
   }
