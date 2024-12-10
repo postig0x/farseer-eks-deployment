@@ -73,7 +73,48 @@ module "eks" {
       desired_size = 4
     }
   }
+
   tags = {
     Name = "${var.environment}-eks-cluster"
+  }
+}
+
+# Create the IAM Role for AWS Load Balancer Controller
+resource "aws_iam_role" "aws_load_balancer_controller_role" {
+  name               = "aws-load-balancer-controller-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Action    = "sts:AssumeRoleWithWebIdentity"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.${var.region}.amazonaws.com/id/${module.eks.cluster_oidc_issuer_url}"
+        }
+        Condition = {
+          StringEquals = {
+            "oidc.eks.${var.region}.amazonaws.com/id/${module.eks.cluster_oidc_issuer_url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Attach the IAM policy to the IAM Role
+resource "aws_iam_policy_attachment" "aws_load_balancer_policy_attachment" {
+  name       = "aws-load-balancer-policy-attachment"
+  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/AWSLoadBalancerControllerIAMPolicy"
+  roles      = [aws_iam_role.aws_load_balancer_controller_role.name]
+}
+
+# Create Kubernetes Service Account and Annotate with IAM Role ARN
+resource "kubernetes_service_account" "aws_load_balancer_controller_sa" {
+  metadata {
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.aws_load_balancer_controller_role.arn
+    }
   }
 }
