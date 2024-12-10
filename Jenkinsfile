@@ -112,7 +112,8 @@ pipeline {
 
                           # configure kubectl
                           echo "configuring kubectl"
-                          aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
+                          eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=qa-eks-cluster --approve
+
 
                           # test connection
                           echo "describe cluster"

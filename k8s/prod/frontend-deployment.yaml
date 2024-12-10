@@ -1,29 +1,28 @@
-apiVersion: apps/v1
+apiVersion: app/v1
 kind: Deployment
 metadata:
-  name: backend
-  namespace: default
+  name: frontend
+  namespace: prod
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: backend
+      app: frontend
   template:
     metadata:
       labels:
-        app: backend
+        app: frontend
     spec:
       containers:
-        - name: backend
-          image: cloudbandits/farseer_back:latest
+        - name: frontend
+          image: cloudbandits/farseer_front:latest
           ports:
-            - containerPort: 8000
+            - containerPort: 3000
           env:
-            - name: XAI_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: farseer-secret
-                  key: XAI_KEY
+            - name: NODE_ENV
+              value: prod
+            - name: REACT_APP_BACKEND_URL
+              value: http://backend:8000
           resources:
             requests:
               cpu: 100m
