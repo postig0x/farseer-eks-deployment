@@ -108,9 +108,9 @@ pipeline {
                           echo "terraform init + apply"
                           pwd
                           terraform init
-                          terraform destroy -auto-approve
+                          terraform apply -auto-approve
 
-                          ./qa_k8s_setup.sh $XAI_KEY
+                          ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
                         '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
