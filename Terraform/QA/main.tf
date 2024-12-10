@@ -62,7 +62,6 @@ resource "aws_eks_cluster" "cluster" {
   version  = "1.31"
 
   vpc_config {
-    vpc_id = module.VPC.vpc_id
     subnet_ids = [
       module.VPC.private_subnet_id1,
       module.VPC.private_subnet_id2,
