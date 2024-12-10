@@ -113,19 +113,23 @@ pipeline {
                           echo "configuring kubectl"
                           aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
 
+                          # test connection
+                          echo "testing connection"
+                          kubectl get nodes --request-timeout=5m
+
                           # create xai key secret from secrets yaml
                           kubectl create secret generic farseer-secret \
                             --from-literal=XAI_KEY=${XAI_KEY} \
-                            --dry-run=client -o yaml | kubectl apply -f -
+                            --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
 
                           # deploy k8s resources
                           echo "deploying k8s resources"
-                          kubectl apply -f k8s/backend-deployment.yaml
-                          kubectl apply -f k8s/backend-service.yaml
-                          kubectl apply -f k8s/frontend-deployment.yaml
-                          kubectl apply -f k8s/frontend-service.yaml
-                          kubectl apply -f k8s/frontend-ingress.yaml
+                          kubectl apply -f k8s/backend-deployment.yaml --validate=false
+                          kubectl apply -f k8s/backend-service.yaml --validate=false
+                          kubectl apply -f k8s/frontend-deployment.yaml --validate=false
+                          kubectl apply -f k8s/frontend-service.yaml --validate=false
+                          kubectl apply -f k8s/frontend-ingress.yaml --validate=false
 
                           # wait for deployments to complete
                           echo "waiting for deployments to complete"
