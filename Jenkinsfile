@@ -75,6 +75,7 @@ pipeline {
 
     stage('Deploy') {
         agent { label 'build-node' }
+        
         steps {
             script {
                 if (env.BRANCH_NAME == 'production') {
@@ -112,28 +113,6 @@ pipeline {
                           # configure kubectl
                           echo "configuring kubectl"
                           aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
-
-                          # Associate IAM OIDC provider
-                          # Change cluster name
-                          # eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=qa-eks-cluster --approve
-                          
-                          # Download IAM Policy JSON file
-                          # curl -O https://raw.githubusercontent.com/kura-labs-org/Template/main/iam_policy.json
-                          
-                          # Create IAM Policy
-                          # Replace ARN with current ARN. Make sure AWS Account ID is correct account ID
-                          # aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json
-                          
-                          # Create IAM Service Account
-                          # Change cluster name
-                          # Replace AWS Account ID with personal AWS Account ID
-                          # eksctl create iamserviceaccount \
-                          #  --cluster=qa-eks-cluster \
-                          #  --namespace=default \
-                          #  --name=aws-load-balancer-controller \
-                          #  --region=us-east-1 \
-                          #  --attach-policy-arn=arn:aws:iam::<AWS Account ID>:policy/AWSLoadBalancerControllerIAMPolicy \
-                          #  --approve
 
                           # test connection
                           echo "describe cluster"
