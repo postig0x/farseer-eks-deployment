@@ -9,15 +9,15 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
-# provider "kubernetes" {
-#   host                   = module.eks.cluster_endpoint
-#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-#   token                  = data.aws_eks_cluster_auth.cluster.token
-# }
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
 
-# data "aws_eks_cluster_auth" "cluster" {
-#   name = module.eks.cluster_name
-# }
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
 
 module "VPC" {
   source      = "./modules/VPC"
@@ -55,6 +55,7 @@ module "eks" {
   cluster_version = "1.31"
 
   cluster_endpoint_public_access = true
+  enable_irsa = true
 
   vpc_id = module.VPC.vpc_id
   subnet_ids = [
