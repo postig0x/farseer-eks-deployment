@@ -107,10 +107,7 @@ pipeline {
                           echo "terraform init + apply"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
-                            -var dev_key="${DEV_KEY}" \
-                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
-                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}"
+                          terraform apply -auto-approve
 
                           # configure kubectl
                           echo "configuring kubectl"
