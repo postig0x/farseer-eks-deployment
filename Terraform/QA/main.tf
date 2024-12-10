@@ -48,18 +48,18 @@ module "eks" {
     module.VPC.private_subnet_id2,
     module.VPC.private_subnet_id3,
     module.VPC.private_subnet_id4
-    ]
-    vpc_id = module.VPC.vpc_id
-    tags = {
-    Name = "${var.environment}-eks-cluster"
-  }
+  ]
+  vpc_id = module.VPC.vpc_id
   eks_managed_node_groups = {
     default = {
       min_size     = 1
-      max_size     = 3
-      desired_size = 1
+      max_size     = 6
+      desired_size = 4
       # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
       instance_types = ["t3.micro"]
     }
+  }
+  tags = {
+    Name = "${var.environment}-eks-cluster"
   }
 }

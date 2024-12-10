@@ -114,6 +114,7 @@ pipeline {
                           aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
 
                           # test connection
+                          sleep 180
                           echo "testing connection"
                           kubectl get nodes --request-timeout=5m
 
