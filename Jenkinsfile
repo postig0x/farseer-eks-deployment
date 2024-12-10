@@ -110,56 +110,7 @@ pipeline {
                           terraform init
                           terraform destroy -auto-approve
 
-                          # configure kubectl
-                          echo "configuring kubectl"
-                          eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=qa-eks-cluster --approve
-
-
-                          # test connection
-                          echo "describe cluster"
-                          aws eks describe-cluster --name qa-eks-cluster --region us-east-1
-                          echo "testing connection"
-                          kubectl get nodes --request-timeout=5m
-
-                          # create xai key secret from secrets yaml
-                          kubectl create secret generic farseer-secret \
-                            --from-literal=XAI_KEY=${XAI_KEY} \
-                            --dry-run=client -o yaml | kubectl apply -f - --validate=false
-
-                          # Get the IAM role ARN and annotate the service account
-                          ROLE_ARN=$(terraform output -raw aws_load_balancer_controller_role_arn || aws_iam_role.aws_load_balancer_controller_role.arn)
-                          kubectl annotate serviceaccount aws-load-balancer-controller \
-                            -n kube-system \
-                            eks.amazonaws.com/role-arn=$ROLE_ARN \
-                            --overwrite
-
-
-                          # deploy k8s resources
-                          echo "deploying k8s resources"
-                          kubectl apply -f k8s/backend-deployment.yaml --validate=false
-                          kubectl apply -f k8s/backend-service.yaml --validate=false
-                          kubectl apply -f k8s/frontend-deployment.yaml --validate=false
-                          kubectl apply -f k8s/frontend-service.yaml --validate=false
-                          kubectl apply -f k8s/frontend-ingress.yaml --validate=false
-
-                          # wait for deployments to complete
-                          echo "waiting for deployments to complete"
-                          kubectl wait --for=condition=available --timeout=600s deployment/backend
-                          kubectl wait --for=condition=available --timeout=600s deployment/frontend
-
-                          # verify deployments
-                          echo "verifying deployments"
-                          kubectl get nodes
-                          kubectl get pods
-                          kubectl get services
-                          kubectl get ingress
-
-                          # check if all pods are running
-                          echo "checking if all pods are running"
-                          if kubectl get pods | grep -v Running | grep -v Completed | grep -v NAME; then
-                            echo "pods are not running"
-                            exit 1
-                          fi
+                          ./qa_k8s_setup.sh $XAI_KEY
                         '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
