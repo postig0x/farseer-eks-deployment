@@ -43,20 +43,31 @@ module "eks" {
   source = "terraform-aws-modules/eks/aws"
   cluster_name = "${var.environment}-eks-cluster"
   cluster_version = "1.27"
+
+  cluster_addons = {
+    coredns = {}
+    eks-pod-identity-agent = {}
+    kube-proxy = {}
+    vpc-cni = {}
+  }
+
+  cluster_endpoint_public_access = true
+
+  vpc_id = module.VPC.vpc_id
   subnet_ids = [
     module.VPC.private_subnet_id1,
     module.VPC.private_subnet_id2,
     module.VPC.private_subnet_id3,
     module.VPC.private_subnet_id4
   ]
-  vpc_id = module.VPC.vpc_id
   eks_managed_node_groups = {
     default = {
-      min_size     = 1
-      max_size     = 6
-      desired_size = 4
       # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
       instance_types = ["t3.micro"]
+      ami_type = "ami-0e2c8caa4b6378d8c"
+      min_size     = 2
+      max_size     = 6
+      desired_size = 4
     }
   }
   tags = {
