@@ -13,6 +13,18 @@ provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.cluster.token
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = [
+      "eks", "get-token", "--cluster-name", module.eks.cluster_name
+    ]
+  }
+}
+
+resource "time_sleep" "wait_eks" {
+  depends_on = [ module.eks ]
+  create_duration = "60s"
 }
 
 data "aws_eks_cluster_auth" "cluster" {
@@ -112,6 +124,7 @@ resource "aws_iam_policy_attachment" "aws_load_balancer_policy_attachment" {
 
 # Create Kubernetes Service Account and Annotate with IAM Role ARN
 resource "kubernetes_service_account" "aws_load_balancer_controller_sa" {
+  depends_on = [ time_sleep.wait_eks ]
   metadata {
     name      = "aws-load-balancer-controller"
     namespace = "kube-system"
