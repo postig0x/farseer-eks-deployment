@@ -109,9 +109,18 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve
-
-                          ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
                         '''
+                    }
+                    // Navigate back to the root directory of the workspace after TF is complete
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/qa/qa_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
+                      '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
