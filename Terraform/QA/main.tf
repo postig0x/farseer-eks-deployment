@@ -64,7 +64,6 @@ module "eks" {
     default = {
       # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
       instance_types = ["t3.micro"]
-      ami_type = "ami-0e2c8caa4b6378d8c"
       min_size     = 2
       max_size     = 6
       desired_size = 4
