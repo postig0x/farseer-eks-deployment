@@ -131,7 +131,8 @@ pipeline {
                             --cluster=qa-eks-cluster \
                             --namespace=default \
                             --name=aws-load-balancer-controller \
-                            --attach-policy-arn=arn:aws:iam::008971635594:policy/AWSLoadBalancerControllerIAMPolicy \
+                            --region=us-east-1 \
+                            --attach-policy-arn=arn:aws:iam::194722418902:policy/AWSLoadBalancerControllerIAMPolicy \
                             --approve
 
                           # test connection
