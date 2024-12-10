@@ -111,7 +111,7 @@ pipeline {
 
                           # configure kubectl
                           echo "configuring kubectl"
-                          aws eks --region us-east-1 update-kubeconfig --name qa-test-eks-cluster
+                          aws eks --region us-east-1 update-kubeconfig --name qa-eks-cluster
 
                           # create xai key secret from secrets yaml
                           kubectl create secret generic farseer-secret \
