@@ -108,7 +108,7 @@ pipeline {
                           echo "terraform init + apply"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform destroy -auto-approve
                         '''
                     }
                     // Navigate back to the root directory of the workspace after TF is complete
