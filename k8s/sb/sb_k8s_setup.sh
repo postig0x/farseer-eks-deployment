@@ -31,7 +31,7 @@ kubectl wait --for=condition=ready pod -l app=webhook -n cert-manager --timeout=
 
 # Apply CRDs first
 kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds"
-sleep 30
+sleep 100
 
 # create xai key secret from secrets yaml
 kubectl create secret generic farseer-secret \
