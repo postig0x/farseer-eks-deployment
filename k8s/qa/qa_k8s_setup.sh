@@ -2,7 +2,7 @@
 
 XAI_KEY="$1"
 
-SUBNET_IDS=$(teraform output  -json private_ips | jq -r 'join(",")')
+SUBNET_IDS=$(terraform output  -json private_ips | jq -r 'join(",")')
 
 echo $SUBNET_IDS
 
