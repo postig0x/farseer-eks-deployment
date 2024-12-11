@@ -128,16 +128,16 @@ pipeline {
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                   }
-                    // echo "Navigating back to the root directory"
-                    // dir('.') {
-                    //   sh '''
-                    //     # Ensure script is executable
-                    //     chmod +x k8s/sb/sb_k8s_setup.sh
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/sb/sb_k8s_setup.sh
 
-                    //     # Execute the script, passing the XAI_KEY ENV Variable
-                    //     ./k8s/sb/sb_k8s_setup.sh $XAI_KEY
-                    //   '''
-                    // }
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/sb/sb_k8s_setup.sh $XAI_KEY
+                      '''
+                    }
                 } else {
                     echo "No deployment for branch: ${env.BRANCH_NAME}"
                     error("Unknown branch: ${env.BRANCH_NAME}")
