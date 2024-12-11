@@ -100,28 +100,6 @@ pipeline {
                           terraform apply -auto-approve
                         '''
                     }
-                } else if (env.BRANCH_NAME == 'qa-eks-test') {
-                    echo "Deploying to Testing Environment"
-                    dir('Terraform/QA') { // Navigate to the qa environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          echo "terraform init + apply"
-                          pwd
-                          terraform init
-                          terraform destroy -auto-approve
-                        '''
-                    }
-                    // Navigate back to the root directory of the workspace after TF is complete
-                    echo "Navigating back to the root directory"
-                    dir('.') {
-                      sh '''
-                        # Ensure script is executable
-                        chmod +x k8s/qa/qa_k8s_setup.sh
-
-                        # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
-                      '''
-                    }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
@@ -136,9 +114,9 @@ pipeline {
                             -var XAI_KEY="${XAI_KEY}"      
                         '''
                     }
-                } else if (env.BRANCH_NAME.startsWith('feature/')) {
+                } else if (env.BRANCH_NAME.startsWith('sb')) {
                     echo "Deploying to Staging Environment"
-                    dir('Terraform/Dev') { // Navigate to the staging environment directory
+                    dir('Terraform/sb') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
@@ -150,6 +128,16 @@ pipeline {
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                   }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/qa/qa_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
+                      '''
+                    }
                 } else {
                     echo "No deployment for branch: ${env.BRANCH_NAME}"
                     error("Unknown branch: ${env.BRANCH_NAME}")
