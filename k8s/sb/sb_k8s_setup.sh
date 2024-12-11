@@ -12,10 +12,13 @@ kubectl apply -f k8s/sb/cluster_sb_binding.yaml
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
 
+kubectl create namespace sb || echo "Namespace sb already exists"
+kubectl config set-context --current --namespace=sb
+
 # Create IAM service account
 eksctl create iamserviceaccount \
   --cluster=sb-test \
-  --namespace=kube-system \
+  --namespace=sb\
   --name=aws-load-balancer-controller \
   --attach-policy-arn=arn:aws:iam::194722418902:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
@@ -51,14 +54,12 @@ kubectl apply -f k8s/sb/sb_v2_4_7_full.yaml
 
 # Wait for the certificate to be ready
 echo "Waiting for AWS Load Balancer Controller certificate..."
-kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n kube-system --timeout=300s
+kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n sb --timeout=300s
 
 # Wait for the controller to be ready
 echo "Waiting for AWS Load Balancer Controller pods..."
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n sb --timeout=300s
 
-kubectl create namespace sb || echo "Namespace sb already exists"
-kubectl config set-context --current --namespace=sb
 
 # Apply remaining resources with increased delays
 kubectl apply -f k8s/ingress_class.yaml
