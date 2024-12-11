@@ -20,6 +20,7 @@ eksctl create nodegroup \
   --nodes 2 \
   --nodes-min 1 \
   --nodes-max 10 \
+  --subnet-ids $SUBNET_IDS \
 
 kubectl wait --for=condition=ready nodes --all --timeout=300s
 
