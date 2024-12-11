@@ -6,31 +6,15 @@ SUBNET_IDS=$(cd Terraform/sb && terraform output  -json private_ips | jq -r 'joi
 
 echo $SUBNET_IDS
 
-# # Create EKS cluster
-# eksctl create cluster sb-eks-cluster \
-# --vpc-private-subnets=$SUBNET_IDS \
-# --without-nodegroup \
-# --region=us-east-1
-
-# # Creating the nodegroup for the cluster with VPC configuration
-# eksctl create nodegroup \
-#   --cluster sb-eks-cluster \
-#   --name sb-eks-nodegroup \
-#   --node-type t3.micro \
-#   --nodes 2 \
-#   --nodes-min 1 \
-#   --nodes-max 10 \
-#   --subnet-ids $SUBNET_IDS
-
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 kubectl apply -f k8s/sb/cluster_sb_binding.yaml
 
 # Associate IAM OIDC provider
-eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-eks-cluster --approve
+eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
 
 # Create IAM service account
 eksctl create iamserviceaccount \
-  --cluster=sb-eks-cluster \
+  --cluster=sb-test \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
   --attach-policy-arn=arn:aws:iam::194722418902:policy/AWSLoadBalancerControllerIAMPolicy \
