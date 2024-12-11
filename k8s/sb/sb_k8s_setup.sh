@@ -14,7 +14,6 @@ eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --
 kubectl config current-context
 kubectl create namespace sb || echo "Namespace sb already exists"
 kubectl config set-context --current --namespace=sb
-kubectl config use-context sb-test
 aws eks update-kubeconfig --region us-east-1 --name sb-test
 
 # Create IAM service account
@@ -28,79 +27,79 @@ eksctl create iamserviceaccount \
 # Install cert-manager first and ensure it's ready
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
 
-# # Wait for cert-manager to be ready - increased timeout and added verification
-# echo "Waiting for cert-manager pods to be ready..."
-# kubectl wait --for=condition=ready pod -l app=cert-manager -n cert-manager --timeout=300s
-# kubectl wait --for=condition=ready pod -l app=cainjector -n cert-manager --timeout=300s
-# kubectl wait --for=condition=ready pod -l app=webhook -n cert-manager --timeout=300s
+# Wait for cert-manager to be ready - increased timeout and added verification
+echo "Waiting for cert-manager pods to be ready..."
+kubectl wait --for=condition=ready pod -l app=cert-manager -n cert-manager --timeout=300s
+kubectl wait --for=condition=ready pod -l app=cainjector -n cert-manager --timeout=300s
+kubectl wait --for=condition=ready pod -l app=webhook -n cert-manager --timeout=300s
 
-# # Apply CRDs first
-# kubectl apply -k "github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller/crds"
-# sleep 30
+# Apply CRDs first
+kubectl apply -k "github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller/crds"
+sleep 30
 
-# # create xai key secret from secrets yaml
-# kubectl create secret generic farseer-secret \
-#   --from-literal=XAI_KEY=$XAI_KEY \
-#   --dry-run=client -o yaml | kubectl apply -f - --validate=false
-
-
-# kubectl apply -f k8s/sb/secrets.yaml
-
-# # Apply the self-signed issuer first
-# kubectl apply -f k8s/self_signed_issuer.yaml
-
-# # Wait for issuer to be ready
-# sleep 10
-
-# # Apply the main controller configuration
-# kubectl apply -f k8s/sb/sb_v2_4_7_full.yaml
-
-# # Wait for the certificate to be ready
-# echo "Waiting for AWS Load Balancer Controller certificate..."
-# kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n sb --timeout=300s
-
-# # Wait for the controller to be ready
-# echo "Waiting for AWS Load Balancer Controller pods..."
-# kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n sb --timeout=300s
+# create xai key secret from secrets yaml
+kubectl create secret generic farseer-secret \
+  --from-literal=XAI_KEY=$XAI_KEY \
+  --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
 
-# # Apply remaining resources with increased delays
-# kubectl apply -f k8s/ingress_class.yaml
-# sleep 45  # Increased delay
+kubectl apply -f k8s/sb/secrets.yaml
 
-# kubectl apply -f k8s/sb/frontend-deployment.yaml
-# kubectl apply -f k8s/sb/backend-deployment.yaml
-# sleep 45  # Increased delay
+# Apply the self-signed issuer first
+kubectl apply -f k8s/self_signed_issuer.yaml
 
-# kubectl apply -f k8s/sb/frontend-service.yaml 
-# kubectl apply -f k8s/sb/backend-service.yaml
-# sleep 45  # Increased delay
+# Wait for issuer to be ready
+sleep 10
 
-# kubectl apply -f k8s/sb/frontend-ingress.yaml
-# sleep 60  # Increased delay for ingress to be processed
+# Apply the main controller configuration
+kubectl apply -f k8s/sb/sb_v2_4_7_full.yaml
 
-# echo "getting deployments"
-# kubectl get deployments
+# Wait for the certificate to be ready
+echo "Waiting for AWS Load Balancer Controller certificate..."
+kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n sb --timeout=300s
 
-# # wait for deployments to complete
-# echo "waiting for deployments to complete"
-# kubectl wait --for=condition=available --timeout=600s deployment/backend
-# kubectl wait --for=condition=available --timeout=600s deployment/frontend 
+# Wait for the controller to be ready
+echo "Waiting for AWS Load Balancer Controller pods..."
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n sb --timeout=300s
 
-# # Wait and get Load Balancer DNS Name
-# sleep 60  # Increased final wait time
-# #aws elbv2 describe-load-balancers --names k8s-default-kurak8de-ff2c43794b --query 'LoadBalancers[0].DNSName' --output text >> lb4.txt
-# aws elbv2 describe-load-balancers --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output text >> loadbalancerdns8.txt
-# # Add verification steps
-# echo "Verifying resources..."
-# kubectl get certificate 
-# kubectl get nodes --request-timeout=5m
-# kubectl get pods | grep aws-load-balancer-controller
-# kubectl get services 
-# kubectl get ingress 
 
-# echo "checking if all pods are running"
-# if kubectl get pods | grep -v Running | grep -v Completed | grep -v NAME; then
-#   echo "pods are not running"
-#   exit 1
-# fi
+# Apply remaining resources with increased delays
+kubectl apply -f k8s/ingress_class.yaml
+sleep 45  # Increased delay
+
+kubectl apply -f k8s/sb/frontend-deployment.yaml
+kubectl apply -f k8s/sb/backend-deployment.yaml
+sleep 45  # Increased delay
+
+kubectl apply -f k8s/sb/frontend-service.yaml 
+kubectl apply -f k8s/sb/backend-service.yaml
+sleep 45  # Increased delay
+
+kubectl apply -f k8s/sb/frontend-ingress.yaml
+sleep 60  # Increased delay for ingress to be processed
+
+echo "getting deployments"
+kubectl get deployments
+
+# wait for deployments to complete
+echo "waiting for deployments to complete"
+kubectl wait --for=condition=available --timeout=600s deployment/backend
+kubectl wait --for=condition=available --timeout=600s deployment/frontend 
+
+# Wait and get Load Balancer DNS Name
+sleep 60  # Increased final wait time
+#aws elbv2 describe-load-balancers --names k8s-default-kurak8de-ff2c43794b --query 'LoadBalancers[0].DNSName' --output text >> lb4.txt
+aws elbv2 describe-load-balancers --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output text >> loadbalancerdns8.txt
+# Add verification steps
+echo "Verifying resources..."
+kubectl get certificate 
+kubectl get nodes --request-timeout=5m
+kubectl get pods | grep aws-load-balancer-controller
+kubectl get services 
+kubectl get ingress 
+
+echo "checking if all pods are running"
+if kubectl get pods | grep -v Running | grep -v Completed | grep -v NAME; then
+  echo "pods are not running"
+  exit 1
+fi
