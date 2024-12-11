@@ -7,9 +7,10 @@ SUBNET_IDS=$(cd Terraform/QA && terraform output  -json private_ips | jq -r 'joi
 echo $SUBNET_IDS
 
 # Create EKS cluster
-# eksctl create cluster qa-eks-cluster --vpc-public-subnets=subnet-0c7755f1dba6358c8,subnet-0c893fcb7da57f2d1 --vpc-private-subnets=subnet-096cb6de98d7239f0,subnet-088b523a067045ade --without-nodegroup
-
-exit 1
+eksctl create cluster qa-eks-cluster \
+--vpc-private-subnets=$SUBNET_IDS \
+--without-nodegroup \
+--region=us-east-1
 
 # Creating the nodegroup for the cluster with VPC configuration
 eksctl create nodegroup \
