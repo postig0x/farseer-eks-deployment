@@ -116,6 +116,7 @@ pipeline {
                           # Execute the script, passing the XAI_KEY ENV Variable
                           ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
                       '''
+                    }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
