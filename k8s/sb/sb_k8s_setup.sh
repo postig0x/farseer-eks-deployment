@@ -19,7 +19,7 @@ aws eks update-kubeconfig --region us-east-1 --name sb-test
 # Create IAM service account
 eksctl create iamserviceaccount \
   --cluster=sb-test \
-  --namespace=kube-system \
+  --namespace=sb \
   --name=aws-load-balancer-controller \
   --attach-policy-arn=arn:aws:iam::194722418902:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
