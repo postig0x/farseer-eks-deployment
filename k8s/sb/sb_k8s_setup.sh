@@ -55,6 +55,11 @@ kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n
 echo "Waiting for AWS Load Balancer Controller pods..."
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s
 
+kubectl create namespace sb
+kubectl get namespaces
+kubectl get crds
+
+
 # Apply remaining resources with increased delays
 kubectl apply -f k8s/ingress_class.yaml
 sleep 45  # Increased delay
