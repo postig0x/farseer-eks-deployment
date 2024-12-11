@@ -98,6 +98,17 @@ resource "aws_eks_cluster" "cluster" {
       module.VPC.private_subnet_id4
     ]
   }
+  
+  depends_on = [ aws_iam_role_policy_attachment.eks_cluster_policy_attachment ]
+}
+
+output "private_ips" {
+  value = [
+    module.VPC.private_subnet_id1,
+    module.VPC.private_subnet_id2,
+    module.VPC.private_subnet_id3,
+    module.VPC.private_subnet_id4
+  ]
 }
 
 # module "eks" {

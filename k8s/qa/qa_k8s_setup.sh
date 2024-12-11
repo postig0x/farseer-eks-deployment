@@ -1,10 +1,26 @@
 #!/bin/bash
 
 XAI_KEY="$1"
-# kubectl wait --for=condition=ready nodes --all --timeout=300s
 
-# Creating the nodegroup for the cluster
-eksctl create nodegroup --cluster qa-eks-cluster --name qa-eks-nodegroup --node-type t3.micro --nodes 2 --nodes-min 1 --nodes-max 10
+SUBNET_IDS=$(teraform output  -json private_ips | jq -r 'join(",")')
+
+echo $SUBNET_IDS
+
+# Create EKS cluster
+# eksctl create cluster qa-eks-cluster --vpc-public-subnets=subnet-0c7755f1dba6358c8,subnet-0c893fcb7da57f2d1 --vpc-private-subnets=subnet-096cb6de98d7239f0,subnet-088b523a067045ade --without-nodegroup
+
+exit 1
+
+# Creating the nodegroup for the cluster with VPC configuration
+eksctl create nodegroup \
+  --cluster qa-eks-cluster \
+  --name qa-eks-nodegroup \
+  --node-type t3.micro \
+  --nodes 2 \
+  --nodes-min 1 \
+  --nodes-max 10 \
+
+kubectl wait --for=condition=ready nodes --all --timeout=300s
 
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=qa-eks-cluster --approve
