@@ -12,13 +12,13 @@ echo $SUBNET_IDS
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
 
-kubectl create namespace sb || echo "Namespace sb already exists"
+# kubectl create namespace sb || echo "Namespace sb already exists"
 
 
 # Create IAM service account
 eksctl create iamserviceaccount \
   --cluster=sb-test \
-  --namespace=sb\
+  --namespace=kube-system \
   --name=aws-load-balancer-controller \
   --attach-policy-arn=arn:aws:iam::194722418902:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
