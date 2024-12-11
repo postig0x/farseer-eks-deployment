@@ -2,6 +2,6 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: aws-load-balancer-selfsigned-issuer
-  namespace: kube-system
+  namespace: sb
 spec:
   selfSigned: {}
