@@ -55,31 +55,30 @@ kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n
 echo "Waiting for AWS Load Balancer Controller pods..."
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s
 
-kubectl create namespace sb
-kubectl get namespaces
-kubectl get crds
-
+kubectl create namespace sb || echo "Namespace sb already exists"
 
 # Apply remaining resources with increased delays
-kubectl apply -f k8s/ingress_class.yaml
+kubectl apply -f k8s/ingress_class.yaml -n sb
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/sb/frontend-deployment.yaml
-kubectl apply -f k8s/sb/backend-deployment.yaml
+kubectl apply -f k8s/sb/frontend-deployment.yaml -n sb
+kubectl apply -f k8s/sb/backend-deployment.yaml -n sb
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/sb/frontend-service.yaml
-kubectl apply -f k8s/sb/backend-service.yaml
+kubectl apply -f k8s/sb/frontend-service.yaml -n sb
+kubectl apply -f k8s/sb/backend-service.yaml -n sb
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/sb/frontend-ingress.yaml
+kubectl apply -f k8s/sb/frontend-ingress.yaml -n sb
 sleep 60  # Increased delay for ingress to be processed
 
+echo "getting deployments"
+kubectl get deployments -n sb 
 
 # wait for deployments to complete
 echo "waiting for deployments to complete"
-kubectl wait --for=condition=available --timeout=600s deployment/backend
-kubectl wait --for=condition=available --timeout=600s deployment/frontend
+kubectl wait --for=condition=available --timeout=600s deployment/backend -n sb
+kubectl wait --for=condition=available --timeout=600s deployment/frontend -n sb
 
 # Wait and get Load Balancer DNS Name
 sleep 60  # Increased final wait time
