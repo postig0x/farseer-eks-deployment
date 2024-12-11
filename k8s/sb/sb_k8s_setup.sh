@@ -47,6 +47,7 @@ kubectl apply -f k8s/sb/secrets.yaml
 
 # Apply the self-signed issuer first
 kubectl apply -f k8s/self_signed_issuer.yaml
+kubectl apply -f aws-load-balancer-serving-cert.yaml
 
 # Wait for issuer to be ready
 sleep 10
@@ -75,11 +76,11 @@ kubectl apply -f k8s/sb/frontend-service.yaml
 kubectl apply -f k8s/sb/backend-service.yaml
 sleep 45  # Increased delay
 
-kubectl apply -f k8s/sb/frontend-ingress.yaml
+kubectl apply -f k8s/sb/frontend-ingress.yaml -n sb
 sleep 60  # Increased delay for ingress to be processed
 
 echo "getting deployments"
-kubectl get deployments
+kubectl get deployments -n sb
 
 # wait for deployments to complete
 echo "waiting for deployments to complete"
@@ -92,14 +93,14 @@ sleep 60  # Increased final wait time
 aws elbv2 describe-load-balancers --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output text >> loadbalancerdns8.txt
 # Add verification steps
 echo "Verifying resources..."
-kubectl get certificate 
-kubectl get nodes --request-timeout=5m
-kubectl get pods | grep aws-load-balancer-controller
-kubectl get services 
-kubectl get ingress 
+kubectl get certificate -n sb
+kubectl get nodes --request-timeout=5m -n sb
+kubectl get pods | grep aws-load-balancer-controller -n sb
+kubectl get services -n sb
+kubectl get ingress -n sb
 
 echo "checking if all pods are running"
-if kubectl get pods | grep -v Running | grep -v Completed | grep -v NAME; then
+if kubectl get pods -n sb| grep -v Running | grep -v Completed | grep -v NAME; then
   echo "pods are not running"
   exit 1
 fi

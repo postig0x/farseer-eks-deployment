@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: aws-load-balancer-serving-cert
+  namespace: sb
+spec:
+  secretName: aws-load-balancer-serving-cert-tls
+  issuerRef:
+    name: aws-load-balancer-selfsigned-issuer
+  commonName: "aws-load-balancer"
+  dnsNames:
+    - "aws-load-balancer"
+  isCA: false
