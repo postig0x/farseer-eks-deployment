@@ -34,7 +34,7 @@ kubectl wait --for=condition=ready pod -l app=cainjector -n cert-manager --timeo
 kubectl wait --for=condition=ready pod -l app=webhook -n cert-manager --timeout=300s
 
 # Apply CRDs first
-kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds"
+kubectl apply -k https://github.com/aws/eks-charts/blob/master/stable/aws-load-balancer-controller/crds/crds.yaml
 sleep 300
 
 # create xai key secret from secrets yaml
