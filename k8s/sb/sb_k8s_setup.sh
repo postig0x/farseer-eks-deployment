@@ -7,7 +7,7 @@ SUBNET_IDS=$(cd Terraform/sb && terraform output  -json private_ips | jq -r 'joi
 echo $SUBNET_IDS
 
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
-kubectl apply -f k8s/sb/cluster_sb_binding.yaml
+# kubectl apply -f k8s/sb/cluster_sb_binding.yaml
 
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
