@@ -23,7 +23,7 @@
 # #   --subnet-ids $SUBNET_IDS
 
 # # kubectl wait --for=condition=ready nodes --all --timeout=300s
-kubectl apply k8s/sb/cluster_sb_binding.yaml
+kubectl apply -f k8s/sb/cluster_sb_binding.yaml
 
 # # Associate IAM OIDC provider
 # eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-eks-cluster --approve
