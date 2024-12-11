@@ -18,18 +18,6 @@ terraform {
   }
 }
 
-# provider "kubernetes" {
-#   host                   = aws_eks_cluster.cluster.endpoint
-#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-#   token                  = data.aws_eks_cluster_auth.cluster.token
-#   exec {
-#     api_version = "client.authentication.k8s.io/v1beta1"
-#     command     = "aws"
-#     args = [
-#       "eks", "get-token", "--cluster-name", aws_eks_cluster.cluster.id
-#     ]
-#   }
-# }
 
 data "aws_caller_identity" "current" {}
 
@@ -39,79 +27,6 @@ module "VPC" {
   cidr_block  = var.cidr_block
 }
 
-# module "EC2" {
-#   source            = "./modules/EC2"
-#   environment       = var.environment
-#   vpc_id            = module.VPC.vpc_id
-#   ec2_ami           = var.ec2_ami
-#   public_subnet_id1  = module.VPC.public_subnet_id1
-#   public_subnet_id2  = module.VPC.public_subnet_id2
-#   private_subnet_id1 = module.VPC.private_subnet_id1
-#   private_subnet_id2 = module.VPC.private_subnet_id2
-#   private_subnet_id3 = module.VPC.private_subnet_id3
-#   private_subnet_id4 = module.VPC.private_subnet_id4
-#   instance_type     = var.instance_type
-#   key_name          = var.key_name
-# }
-
-# module ALB{
-#     source= "./modules/ALB"
-#     private_subnet_id1 = module.VPC.private_subnet_id1
-#     private_subnet_id2 = module.VPC.private_subnet_id2
-#     frontend1 = module.EC2.frontend1
-#     frontend2 = module.EC2.frontend2
-#     vpc_id = module.VPC.vpc_id
-# }
-
-# resource "aws_iam_role" "cluster_role" {
-#   name = "${var.environment}-eks-cluster-servicerole"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action    = "sts:AssumeRole"
-#         Principal = {
-#           Service = "eks.amazonaws.com"
-#         }
-#         Effect    = "Allow"
-#         Sid       = ""
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_iam_role_policy_attachment" "eks_cluster_policy_attachment" {
-#   role       = aws_iam_role.cluster_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-# }
-
-# resource "aws_iam_role_policy_attachment" "eks_vpc_resource_policy_attachment" {
-#   role       = aws_iam_role.cluster_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-# }
-
-# resource "aws_eks_cluster" "cluster" {
-#   name = "${var.environment}-eks-cluster"
-
-#   access_config {
-#     authentication_mode = "API_AND_CONFIG_MAP"
-#   }
-
-#   role_arn = aws_iam_role.cluster_role.arn
-#   version  = "1.31"
-
-#   vpc_config {
-#     subnet_ids = [
-#       module.VPC.private_subnet_id1,
-#       module.VPC.private_subnet_id2,
-#       module.VPC.private_subnet_id3,
-#       module.VPC.private_subnet_id4
-#     ]
-#   }
-  
-#   depends_on = [ aws_iam_role_policy_attachment.eks_cluster_policy_attachment ]
-# }
 
 output "private_ips" {
   value = [
@@ -122,128 +37,128 @@ output "private_ips" {
   ]
 }
 
-# module "eks" {
-#   source          = "terraform-aws-modules/eks/aws"
-#   cluster_name    = aws_eks_cluster.cluster.id
-#   cluster_version = aws_eks_cluster.cluster.version
+resource "aws_iam_role" "eks" {
+  name = "sb-test-eks-cluster"
 
-#   cluster_endpoint_public_access = true
-#   # Adds the current caller identity as an administrator via cluster access entry
-#   enable_cluster_creator_admin_permissions = true
-#   authentication_mode                      = "API_AND_CONFIG_MAP"
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "eks.amazonaws.com"
+      }
+    }
+  ]
+}
+POLICY
+}
+resource "aws_iam_role_policy_attachment" "eks" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks.name
+}
 
+resource "aws_eks_cluster" "eks" {
+  name     = "sb-test"
+  version  = 1.29
+  role_arn = aws_iam_role.eks.arn
 
-#   # enable_irsa = true
-#   eks_managed_node_groups = {
-#     default = {
-#       # https://www.middlewareinventory.com/blog/kubernetes-max-pods-per-node/
-#       instance_types = ["t3.micro"]
-#       min_size       = 1
-#       max_size       = 6
-#       desired_size   = 4
-#       iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup"
-#     }
-#   }
+  vpc_config {
+    endpoint_private_access = false
+    endpoint_public_access  = true
 
-#   tags = {
-#     Name = "${var.environment}-eks-cluster"
-#   }
-# }
+    subnet_ids = [
+      module.VPC.private_subnet_id1,
+      module.VPC.private_subnet_id2,
+      module.VPC.private_subnet_id3,
+      module.VPC.private_subnet_id4
+    ]
+  }
 
-# # Create the IAM Role for AWS Load Balancer Controller
-# resource "aws_iam_role" "aws_load_balancer_controller_role" {
-#   name = "aws-load-balancer-controller-role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = "sts:AssumeRoleWithWebIdentity"
-#         Principal = {
-#           Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.${var.region}.amazonaws.com/id/${module.eks.cluster_oidc_issuer_url}"
-#         }
-#         Condition = {
-#           StringEquals = {
-#             "oidc.eks.${var.region}.amazonaws.com/id/${module.eks.cluster_oidc_issuer_url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
-#           }
-#         }
-#       }
-#     ]
-#   })
-# }
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
 
-# # Attach the IAM policy to the IAM Role
-# resource "aws_iam_policy_attachment" "aws_load_balancer_policy_attachment" {
-#   name       = "aws-load-balancer-policy-attachment"
-#   policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/AWSLoadBalancerControllerIAMPolicy"
-#   roles      = [aws_iam_role.aws_load_balancer_controller_role.name]
-# }
+  depends_on = [aws_iam_role_policy_attachment.eks]
+}
 
-# # Create Kubernetes Service Account and Annotate with IAM Role ARN
-# resource "kubernetes_service_account" "aws_load_balancer_controller_sa" {
-#   depends_on = [time_sleep.wait_eks]
-#   metadata {
-#     name      = "aws-load-balancer-controller"
-#     namespace = "kube-system"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.aws_load_balancer_controller_role.arn
-#     }
-#   }
-# }
+resource "aws_iam_role" "nodes" {
+  name = "sb-test-eks-nodes"
 
-# resource "kubernetes_config_map" "aws_auth" {
-#   metadata {
-#     name      = "aws-auth"
-#     namespace = "default"
-#   }
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      }
+    }
+  ]
+}
+POLICY
+}
 
-#   data = {
-#     mapRoles = yamlencode([
-#       {
-#         rolearn  = aws_iam_role.aws_load_balancer_controller_role.name
-#         username = "sb-eks-load-balancer-controller"
-#         groups   = ["system:masters"] # Grants admin access; adjust as needed
-#       }
-#     ])
-#   }
+# This policy now includes AssumeRoleForPodIdentity for the Pod Identity Agent
+resource "aws_iam_role_policy_attachment" "amazon_eks_worker_node_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.nodes.name
+}
 
-#   depends_on = [module.eks]
-# }
+resource "aws_iam_role_policy_attachment" "amazon_eks_cni_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.nodes.name
+}
 
-# # Install cert-manager
-# resource "kubernetes_manifest" "cert_manager" {
-#   manifest = yamldecode(file("https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml"))
-# }
+resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_only" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.nodes.name
+}
 
-# # Apply CRDs for AWS Load Balancer Controller
-# resource "kubernetes_manifest" "aws_load_balancer_crds" {
-#   manifest = yamldecode(file("https://github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds"))
-# }
+resource "aws_eks_node_group" "general" {
+  cluster_name    = aws_eks_cluster.eks.name
+  version         = 1.29
+  node_group_name = "general"
+  node_role_arn   = aws_iam_role.nodes.arn
 
-# # Create the self-signed issuer
-# resource "kubernetes_manifest" "self_signed_issuer" {
-#   manifest = yamldecode(file("../kubernetes_manifests/self_signed_issuer.yaml"))
-# }
+  subnet_ids = [
+      module.VPC.private_subnet_id1,
+      module.VPC.private_subnet_id2,
+      module.VPC.private_subnet_id3,
+      module.VPC.private_subnet_id4
+  ]
 
-# # Kubernetes Manifest resources to use the yaml files we have for K8s
-# resource "kubernetes_manifest" "frontend_deployment" {
-#   manifest = yamldecode(file("../kubernetes_manifests/frontend-deployment.yaml"))
-# }
-# resource "kubernetes_manifest" "backend_deployment" {
-#   manifest = yamldecode(file("../kubernetes_manifests/backend-deployment.yaml"))
-# }
+  capacity_type  = "ON_DEMAND"
+  instance_types = ["t3.medium"]
 
-# resource "kubernetes_manifest" "frontend_service" {
-#   manifest = yamldecode(file("../kubernetes_manifests/frontend-service.yaml"))
-# }
-# resource "kubernetes_manifest" "backend_service" {
-#   manifest = yamldecode(file("../kubernetes_manifests/backend-service.yaml"))
-# }
+  scaling_config {
+    desired_size = 2
+    max_size     = 5
+    min_size     = 0
+  }
 
-# resource "kubernetes_manifest" "frontend_ingress" {
-#   manifest = yamldecode(file("../kubernetes_manifests/frontend-ingress.yaml"))
-# }
+  update_config {
+    max_unavailable = 1
+  }
 
-# resource "kubernetes_manifest" "secrets" {
-#   manifest = yamldecode(file("../kubernetes_manifests/secrets.yaml"))
-# }
+  labels = {
+    role = "general"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.amazon_eks_worker_node_policy,
+    aws_iam_role_policy_attachment.amazon_eks_cni_policy,
+    aws_iam_role_policy_attachment.amazon_ec2_container_registry_read_only,
+  ]
+
+  # Allow external changes without Terraform plan difference
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+}
+
