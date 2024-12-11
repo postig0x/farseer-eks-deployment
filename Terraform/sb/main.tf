@@ -7,6 +7,17 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.49"
+    }
+  }
+}
+
 # provider "kubernetes" {
 #   host                   = aws_eks_cluster.cluster.endpoint
 #   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
