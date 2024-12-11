@@ -38,6 +38,8 @@ kubectl create secret generic farseer-secret \
   --from-literal=XAI_KEY=$XAI_KEY \
   --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
+kubectl apply -f k8s/sb/secrets.yaml
+
 # Apply the self-signed issuer first
 kubectl apply -f k8s/self_signed_issuer.yaml
 
