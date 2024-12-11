@@ -7,13 +7,13 @@ SUBNET_IDS=$(cd Terraform/sb && terraform output  -json private_ips | jq -r 'joi
 echo $SUBNET_IDS
 
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
-# kubectl apply -f k8s/sb/cluster_sb_binding.yaml
+kubectl apply -f k8s/sb/cluster_sb_binding.yaml
 
 # Associate IAM OIDC provider
 eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
 
-# kubectl create namespace sb || echo "Namespace sb already exists"
-
+kubectl create namespace sb || echo "Namespace sb already exists"
+kubectl config set-context --current --namespace=sb
 
 # Create IAM service account
 eksctl create iamserviceaccount \
@@ -41,7 +41,7 @@ kubectl create secret generic farseer-secret \
   --from-literal=XAI_KEY=$XAI_KEY \
   --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
-kubectl config set-context --current --namespace=sb
+
 kubectl apply -f k8s/sb/secrets.yaml
 
 # Apply the self-signed issuer first
