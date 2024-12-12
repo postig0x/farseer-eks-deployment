@@ -12,9 +12,6 @@ aws eks update-kubeconfig --region us-east-1 --name sb-test
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
-kubectl apply -f k8s/sb/secrets.yaml
-kubectl apply -f k8s/sb/backend
-kubectl apply -f k8s/sb/frontend
 
 
 # Install cert-manager first and ensure it's ready
@@ -42,32 +39,25 @@ kubectl apply -f k8s/self_signed_issuer.yaml
 # # Wait for issuer to be ready
 # sleep 10
 
-# # Apply the main controller configuration
-# kubectl apply -f k8s/sb/sb_v2_4_7_full.yaml
+# Apply the main controller configuration
+kubectl apply -f k8s/sb/sb_v2_4_7_full.yaml
 
-# # Wait for the certificate to be ready
-# echo "Waiting for AWS Load Balancer Controller certificate..."
-# kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n sb --timeout=300s
+# Wait for the certificate to be ready
+echo "Waiting for AWS Load Balancer Controller certificate..."
+kubectl wait --for=condition=ready certificate aws-load-balancer-serving-cert -n sb --timeout=300s
 
-# # Wait for the controller to be ready
-# echo "Waiting for AWS Load Balancer Controller pods..."
-# kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n sb --timeout=300s
+# Wait for the controller to be ready
+echo "Waiting for AWS Load Balancer Controller pods..."
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n sb --timeout=300s
 
 
-# # Apply remaining resources with increased delays
-# kubectl apply -f k8s/ingress_class.yaml
-# sleep 45  # Increased delay
+# Apply remaining resources with increased delays
+kubectl apply -f k8s/ingress_class.yaml
+sleep 45  # Increased delay
 
-# kubectl apply -f k8s/sb/frontend-deployment.yaml
-# kubectl apply -f k8s/sb/backend-deployment.yaml
-# sleep 45  # Increased delay
-
-# kubectl apply -f k8s/sb/frontend-service.yaml 
-# kubectl apply -f k8s/sb/backend-service.yaml
-# sleep 45  # Increased delay
-
-# kubectl apply -f k8s/sb/frontend-ingress.yaml -n sb
-# sleep 60  # Increased delay for ingress to be processed
+kubectl apply -f k8s/sb/secrets.yaml
+kubectl apply -f k8s/sb/backend
+kubectl apply -f k8s/sb/frontend
 
 # echo "getting deployments"
 # kubectl get deployments -n sb
