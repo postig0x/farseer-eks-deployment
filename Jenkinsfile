@@ -116,12 +116,12 @@ pipeline {
                     }
                 } else if (env.BRANCH_NAME.startsWith('sb')) {
                     echo "Deploying to Staging Environment"
-                    dir('Terraform/sb') { // Navigate to the staging environment directory
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform destroy -auto-approve \
+                          terraform apply -auto-approve \
                             -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
                             -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
                             -var XAI_KEY="${XAI_KEY}"
@@ -132,10 +132,10 @@ pipeline {
                     dir('.') {
                       sh '''
                         # Ensure script is executable
-                        chmod +x k8s/sb/sb_k8s_setup.sh
+                        chmod +x k8s/dev/dev_k8s_setup.sh
 
                         # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/sb/sb_k8s_setup.sh $XAI_KEY
+                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
                       '''
                     }
                 } else {

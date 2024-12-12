@@ -458,7 +458,7 @@ resource "aws_eks_access_entry" "manager" {
 
 # resource "aws_iam_policy" "aws_lbc" {
 #   policy = file("./iam/AWSLoadBalancerController.json")
-#   name   = "EKS-AWSLoadBalancerController"
+#   name   = "AWSLoadBalancerController"
 # }
 
 # resource "aws_iam_role_policy_attachment" "aws_lbc" {
