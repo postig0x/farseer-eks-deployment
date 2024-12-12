@@ -12,8 +12,10 @@ aws eks update-kubeconfig --region us-east-1 --name sb-test
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
+kubectl apply -f k8s/sb/secrets.yaml
 kubectl apply -f k8s/sb/backend
 kubectl apply -f k8s/sb/frontend
+
 
 
 # aws eks update-kubeconfig --name sb-test --region us-east-1 --profile developer
@@ -57,7 +59,7 @@ kubectl apply -f k8s/sb/frontend
 #   --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
 
-# kubectl apply -f k8s/sb/secrets.yaml
+
 
 # # Apply the self-signed issuer first
 # kubectl apply -f k8s/self_signed_issuer.yaml
