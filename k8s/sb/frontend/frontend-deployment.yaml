@@ -1,10 +1,10 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
   namespace: sb
 spec:
-  # replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -17,7 +17,8 @@ spec:
         - name: frontend
           image: cloudbandits/farseer_front:latest
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3000
           env:
             - name: NODE_ENV
               value: sb
@@ -25,9 +26,8 @@ spec:
               value: http://backend:8000
           resources:
             requests:
-              cpu: 100m
               memory: 256Mi
+              cpu: 100m
             limits:
-              cpu: 200m
-              memory: 512Mi
-      restartPolicy: Always
+              memory: 256Mi
+              cpu: 100m
