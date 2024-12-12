@@ -10,7 +10,7 @@ metadata:
   #   # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
 spec:
   # type: LoadBalancer
-  type: ClusterIP
+  # type: ClusterIP
   selector:
     app: backend
   ports:
