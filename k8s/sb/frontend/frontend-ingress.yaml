@@ -17,7 +17,6 @@ spec:
   ingressClassName: alb
   rules:
     - host: farseer.cloud
-    
       http:
         paths:
           - path: /
