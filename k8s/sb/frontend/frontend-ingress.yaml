@@ -1,20 +1,22 @@
----
-# Supported annotations
-# https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/ingress/annotations/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend
   namespace: sb
   annotations:
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:194722418902:certificate/1ab9ca8b-912c-4b1e-8714-20496057e144
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    # Use a LoadBalancer type ingress class (AWS ALB in this case)
+    alb.ingress.kubernetes.io/certificate-arn: "" # Leave blank if you're using the Kubernetes secret for TLS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /health
 spec:
   ingressClassName: alb
+  tls:
+    - hosts:
+        - farseer.cloud # Your custom domain
+      secretName: self-signed-cert # Kubernetes secret created earlier
   rules:
     - host: farseer.cloud
       http:
@@ -23,6 +25,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend
+                name: frontend # Your frontend service name
                 port:
                   number: 3000
