@@ -9,8 +9,8 @@ kubectl create namespace prod || echo "Namespace prod already exists"
 kubectl config set-context --current --namespace=prod
 aws eks update-kubeconfig --region us-east-1 --name prod-eks-cluster
 
-# kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
-# kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
+# kubectl apply -f k8s/prod/roles/dev_role_binding.yaml
+# kubectl apply -f k8s/prod/roles/admin_role_binding.yaml
 
 
 kubectl apply -f k8s/prod/secrets.yaml

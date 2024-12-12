@@ -9,8 +9,8 @@ kubectl create namespace qa || echo "Namespace qa already exists"
 kubectl config set-context --current --namespace=qa
 aws eks update-kubeconfig --region us-east-1 --name qa-eks-cluster
 
-# kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
-# kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
+# kubectl apply -f k8s/qa/roles/dev_role_binding.yaml
+# kubectl apply -f k8s/qa/roles/admin_role_binding.yaml
 
 
 kubectl apply -f k8s/qa/secrets.yaml
