@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: ex7.antonputra.com
+    - host: ex6.antonputra.com
       http:
         paths:
           - path: /
