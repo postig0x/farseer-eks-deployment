@@ -333,31 +333,31 @@ resource "helm_release" "metrics_server" {
 
 
 #--------------Cluster Autoscaler---------------------------
-resource "aws_eks_addon" "pod_identity" {
-  cluster_name  = aws_eks_cluster.eks.name
-  addon_name    = "${var.environment}-eks-pod-identity-agent"
-  addon_version = "v1.2.0-eksbuild.1"
-}
+# resource "aws_eks_addon" "pod_identity" {
+#   cluster_name  = aws_eks_cluster.eks.name
+#   addon_name    = "${var.environment}-eks-pod-identity-agent"
+#   addon_version = "v1.2.0-eksbuild.1"
+# }
 
-resource "aws_iam_role" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+# resource "aws_iam_role" "cluster_autoscaler" {
+#   name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sts:AssumeRole",
-          "sts:TagSession"
-        ]
-        Principal = {
-          Service = "pods.eks.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "sts:AssumeRole",
+#           "sts:TagSession"
+#         ]
+#         Principal = {
+#           Service = "pods.eks.amazonaws.com"
+#         }
+#       }
+#     ]
+#   })
+# }
 
 # resource "aws_iam_policy" "cluster_autoscaler" {
 #   name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
@@ -491,5 +491,5 @@ resource "helm_release" "aws_lbc" {
     value = "aws-load-balancer-controller"
   }
 
-  depends_on = [helm_release.cluster_autoscaler]
+  # depends_on = [helm_release.cluster_autoscaler]
 }
