@@ -144,10 +144,6 @@ resource "aws_eks_node_group" "general" {
     max_unavailable = 1
   }
 
-  tags = {
-    Name        = "${var.environment}-eks-node"
-  }
-
   labels = {
     role = "general"
   }
