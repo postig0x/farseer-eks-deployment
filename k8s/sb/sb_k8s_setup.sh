@@ -15,11 +15,6 @@ kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
 kubectl apply -f k8s/sb/roles/rbac.yaml
 
 
-kubectl -n sb create secret tls self-signed-cert \
-  --cert=k8s/sb/certs/cert.crt \
-  --key=k8s/sb/certs/cert_key.key
-
-
 
 # # Install cert-manager first and ensure it's ready
 # kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
