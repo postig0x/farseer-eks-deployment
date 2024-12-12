@@ -28,7 +28,7 @@ variable "ec2_ami" {
 
 variable "key_name" {
   type    = string
-  default = "${var.environment}-ssh-key"
+  default = "dev-ssh-key"
 }
 variable "DOCKER_CREDS_USR"{}
 variable "DOCKER_CREDS_PSW" {}
