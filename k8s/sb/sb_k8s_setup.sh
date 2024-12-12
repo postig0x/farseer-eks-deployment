@@ -10,6 +10,7 @@ echo $SUBNET_IDS
 kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
 
+
 # aws eks update-kubeconfig --name sb-test --region us-east-1 --profile developer
 # kubectl config view --minify
 # kubectl get pods
