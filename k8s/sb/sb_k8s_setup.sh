@@ -36,10 +36,8 @@ kubectl apply -f https://raw.githubusercontent.com/aws/eks-charts/master/stable/
 #   --dry-run=client -o yaml | kubectl apply -f - --validate=false
 
 
-
-
-# # Apply the self-signed issuer first
-# kubectl apply -f k8s/self_signed_issuer.yaml
+# Apply the self-signed issuer first
+kubectl apply -f k8s/self_signed_issuer.yaml
 
 # # Wait for issuer to be ready
 # sleep 10
