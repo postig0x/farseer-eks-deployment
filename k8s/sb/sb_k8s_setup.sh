@@ -11,12 +11,15 @@ kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
 
 
+
+
 # aws eks update-kubeconfig --name sb-test --region us-east-1 --profile developer
 # kubectl config view --minify
 # kubectl get pods
 # kubectl get nodes
 # aws eks update-kubeconfig --name sb-test --region us-east-1
 
+kubectl apply -f k8s/sb/backend
 
 # # Associate IAM OIDC provider
 # eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
