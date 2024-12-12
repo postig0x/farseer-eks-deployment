@@ -116,7 +116,7 @@ pipeline {
                     }
                 } else if (env.BRANCH_NAME.startsWith('sb')) {
                     echo "Deploying to Staging Environment"
-                    dir('Terraform/sb') { // Navigate to the staging environment directory
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
@@ -174,7 +174,6 @@ pipeline {
     }
         }
   
-
 
 
 
