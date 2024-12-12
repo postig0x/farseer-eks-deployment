@@ -5,7 +5,7 @@ metadata:
   name: frontend
   namespace: sb
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 3000
       targetPort: http
