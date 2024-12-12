@@ -59,28 +59,28 @@ kubectl apply -f k8s/sb/secrets.yaml
 kubectl apply -f k8s/sb/backend
 kubectl apply -f k8s/sb/frontend
 
-# echo "getting deployments"
-# kubectl get deployments -n sb
+echo "getting deployments"
+kubectl get deployments -n sb
 
-# # wait for deployments to complete
-# echo "waiting for deployments to complete"
-# kubectl wait --for=condition=available --timeout=600s deployment/backend
-# kubectl wait --for=condition=available --timeout=600s deployment/frontend 
+# wait for deployments to complete
+echo "waiting for deployments to complete"
+kubectl wait --for=condition=available --timeout=600s deployment/backend
+kubectl wait --for=condition=available --timeout=600s deployment/frontend 
 
-# # Wait and get Load Balancer DNS Name
-# sleep 60  # Increased final wait time
-# #aws elbv2 describe-load-balancers --names k8s-default-kurak8de-ff2c43794b --query 'LoadBalancers[0].DNSName' --output text >> lb4.txt
-# aws elbv2 describe-load-balancers --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output text >> loadbalancerdns8.txt
-# # Add verification steps
-# echo "Verifying resources..."
-# kubectl get certificate -n sb
-# kubectl get nodes --request-timeout=5m -n sb
-# kubectl get pods | grep aws-load-balancer-controller -n sb
-# kubectl get services -n sb
-# kubectl get ingress -n sb
+# Wait and get Load Balancer DNS Name
+sleep 60  # Increased final wait time
+#aws elbv2 describe-load-balancers --names k8s-default-kurak8de-ff2c43794b --query 'LoadBalancers[0].DNSName' --output text >> lb4.txt
+aws elbv2 describe-load-balancers --query 'LoadBalancers[*].[LoadBalancerName,DNSName]' --output text >> loadbalancerdns8.txt
+# Add verification steps
+echo "Verifying resources..."
+kubectl get certificate -n sb
+kubectl get nodes --request-timeout=5m -n sb
+kubectl get pods | grep aws-load-balancer-controller -n sb
+kubectl get services -n sb
+kubectl get ingress -n sb
 
-# echo "checking if all pods are running"
-# if kubectl get pods -n sb| grep -v Running | grep -v Completed | grep -v NAME; then
-#   echo "pods are not running"
-#   exit 1
-# fi
+echo "checking if all pods are running"
+if kubectl get pods -n sb| grep -v Running | grep -v Completed | grep -v NAME; then
+  echo "pods are not running"
+  exit 1
+fi

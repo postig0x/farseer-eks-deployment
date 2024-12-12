@@ -1,23 +1,23 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: frontend-ingress
-  namespace: sb
-  annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: instance
-    alb.ingress.kubernetes.io/tags: Environment=staging
-    # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-spec:
-  ingressClassName: alb
-  type: LoadBalancer
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: frontend-ingress
+#   namespace: sb
+#   annotations:
+#     alb.ingress.kubernetes.io/scheme: internet-facing
+#     alb.ingress.kubernetes.io/target-type: instance
+#     alb.ingress.kubernetes.io/tags: Environment=staging
+
+#     # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+# spec:
+#   ingressClassName: alb
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: frontend
+#             port:
+#               number: 80
