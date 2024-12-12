@@ -38,7 +38,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster-role"
+  name = "sb-test-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -61,7 +61,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test-eks-cluster"
+  name     = "sb-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -86,7 +86,7 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name = "${var.environment}-test-eks-nodes-role"
+  name = "sb-test-eks-nodes"
 
   assume_role_policy = <<POLICY
 {
@@ -123,7 +123,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodegroup"
+  node_group_name = "general"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -163,10 +163,9 @@ resource "aws_eks_node_group" "general" {
 }
 
 resource "aws_iam_user" "developer" {
-  name = "eks-developer"
+  name = "developer"
 }
 
-# Will need to look at how to make this so this doesn't error out 
 resource "aws_iam_policy" "developer_eks" {
   name = "AmazonEKSDeveloperPolicy"
 
@@ -195,7 +194,7 @@ resource "aws_iam_user_policy_attachment" "developer_eks" {
 resource "aws_eks_access_entry" "developer" {
   cluster_name      = aws_eks_cluster.eks.name
   principal_arn     = aws_iam_user.developer.arn
-  kubernetes_groups = ["eks-my-viewer"]
+  kubernetes_groups = ["my-viewer"]
 }
 
 
@@ -203,7 +202,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "eks-admin"
+  name = "sb-test-eks-admin"
 
   assume_role_policy = <<POLICY
 {
@@ -256,7 +255,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "eks-manager"
+  name = "manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
@@ -287,200 +286,200 @@ resource "aws_iam_user_policy_attachment" "manager" {
 resource "aws_eks_access_entry" "manager" {
   cluster_name      = aws_eks_cluster.eks.name
   principal_arn     = aws_iam_role.eks_admin.arn
-  kubernetes_groups = ["eks-my-admin"]
+  kubernetes_groups = ["my-admin"]
 }
 
 
-# # ---------------HPA----------------------------
+# ---------------HPA----------------------------
 
-# data "aws_eks_cluster" "eks" {
-#   name = aws_eks_cluster.eks.name
-# }
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.eks.name
+}
 
-# data "aws_eks_cluster_auth" "eks" {
-#   name = aws_eks_cluster.eks.name
-# }
+data "aws_eks_cluster_auth" "eks" {
+  name = aws_eks_cluster.eks.name
+}
 
-# provider "helm" {
-#   kubernetes {
-#     host                   = data.aws_eks_cluster.eks.endpoint
-#     cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-#     token                  = data.aws_eks_cluster_auth.eks.token
-#   }
-# }
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.eks.token
+  }
+}
 
-# resource "helm_release" "metrics_server" {
-#   name = "metrics-server"
+resource "helm_release" "metrics_server" {
+  name = "metrics-server"
 
-#   repository = "https://kubernetes-sigs.github.io/metrics-server/"
-#   chart      = "metrics-server"
-#   namespace  = "${var.environment}"
-#   version    = "3.12.1"
+  repository = "https://kubernetes-sigs.github.io/metrics-server/"
+  chart      = "metrics-server"
+  namespace  = "sb"
+  version    = "3.12.1"
 
-#   values = [file("${path.module}/values/metrics-server.yaml")]
+  values = [file("${path.module}/values/metrics-server.yaml")]
 
-#   depends_on = [aws_eks_node_group.general]
-# }
-
-
-# #--------------Cluster Autoscaler---------------------------
-# resource "aws_eks_addon" "pod_identity" {
-#   cluster_name  = aws_eks_cluster.eks.name
-#   addon_name    = "${var.environment}-eks-pod-identity-agent"
-#   addon_version = "v1.2.0-eksbuild.1"
-# }
-
-# resource "aws_iam_role" "cluster_autoscaler" {
-#   name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "sts:AssumeRole",
-#           "sts:TagSession"
-#         ]
-#         Principal = {
-#           Service = "pods.eks.amazonaws.com"
-#         }
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_iam_policy" "cluster_autoscaler" {
-#   name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
-
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "autoscaling:DescribeAutoScalingGroups",
-#           "autoscaling:DescribeAutoScalingInstances",
-#           "autoscaling:DescribeLaunchConfigurations",
-#           "autoscaling:DescribeScalingActivities",
-#           "autoscaling:DescribeTags",
-#           "ec2:DescribeImages",
-#           "ec2:DescribeInstanceTypes",
-#           "ec2:DescribeLaunchTemplateVersions",
-#           "ec2:GetInstanceTypesFromInstanceRequirements",
-#           "eks:DescribeNodegroup"
-#         ]
-#         Resource = "*"
-#       },
-#       {
-#         Effect = "Allow"
-#         Action = [
-#           "autoscaling:SetDesiredCapacity",
-#           "autoscaling:TerminateInstanceInAutoScalingGroup"
-#         ]
-#         Resource = "*"
-#       },
-#     ]
-#   })
-# }
-
-# resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
-#   policy_arn = aws_iam_policy.cluster_autoscaler.arn
-#   role       = aws_iam_role.cluster_autoscaler.name
-# }
-
-# resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
-#   cluster_name    = aws_eks_cluster.eks.name
-#   namespace       = "${var.environment}"
-#   service_account = "${var.environment}-cluster-autoscaler"
-#   role_arn        = aws_iam_role.cluster_autoscaler.arn
-# }
-
-# resource "helm_release" "cluster_autoscaler" {
-#   name = "autoscaler"
-
-#   repository = "https://kubernetes.github.io/autoscaler"
-#   chart      = "cluster-autoscaler"
-#   namespace  = "${var.environment}"
-#   version    = "9.37.0"
-
-#   set {
-#     name  = "rbac.serviceAccount.name"
-#     value = "cluster-autoscaler"
-#   }
-
-#   set {
-#     name  = "autoDiscovery.clusterName"
-#     value = aws_eks_cluster.eks.name
-#   }
-
-#   # MUST be updated to match your region 
-#   set {
-#     name  = "awsRegion"
-#     value = "us-east-1"
-#   }
-
-#   depends_on = [helm_release.metrics_server]
-# }
+  depends_on = [aws_eks_node_group.general]
+}
 
 
-# #-------------------LOADBALANCER------------------
+#--------------Cluster Autoscaler---------------------------
+resource "aws_eks_addon" "pod_identity" {
+  cluster_name  = aws_eks_cluster.eks.name
+  addon_name    = "eks-pod-identity-agent"
+  addon_version = "v1.2.0-eksbuild.1"
+}
 
-# data "aws_iam_policy_document" "aws_lbc" {
-#   statement {
-#     effect = "Allow"
+resource "aws_iam_role" "cluster_autoscaler" {
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["pods.eks.amazonaws.com"]
-#     }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
+        Principal = {
+          Service = "pods.eks.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
 
-#     actions = [
-#       "sts:AssumeRole",
-#       "sts:TagSession"
-#     ]
-#   }
-# }
+resource "aws_iam_policy" "cluster_autoscaler" {
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
-# resource "aws_iam_role" "aws_lbc" {
-#   name               = "${aws_eks_cluster.eks.name}-aws-lbc"
-#   assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
-# }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeScalingActivities",
+          "autoscaling:DescribeTags",
+          "ec2:DescribeImages",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:GetInstanceTypesFromInstanceRequirements",
+          "eks:DescribeNodegroup"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
+}
 
-# resource "aws_iam_policy" "aws_lbc" {
-#   policy = file("./iam/AWSLoadBalancerController.json")
-#   name   = "EKS-AWSLoadBalancerController"
-# }
+resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
+  policy_arn = aws_iam_policy.cluster_autoscaler.arn
+  role       = aws_iam_role.cluster_autoscaler.name
+}
 
-# resource "aws_iam_role_policy_attachment" "aws_lbc" {
-#   policy_arn = aws_iam_policy.aws_lbc.arn
-#   role       = aws_iam_role.aws_lbc.name
-# }
+resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
+  cluster_name    = aws_eks_cluster.eks.name
+  namespace       = "sb"
+  service_account = "cluster-autoscaler"
+  role_arn        = aws_iam_role.cluster_autoscaler.arn
+}
 
-# resource "aws_eks_pod_identity_association" "aws_lbc" {
-#   cluster_name    = aws_eks_cluster.eks.name
-#   namespace       = "${var.environment}"
-#   service_account = "aws-load-balancer-controller"
-#   role_arn        = aws_iam_role.aws_lbc.arn
-# }
+resource "helm_release" "cluster_autoscaler" {
+  name = "autoscaler"
 
-# resource "helm_release" "aws_lbc" {
-#   name = "aws-load-balancer-controller"
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  namespace  = "sb"
+  version    = "9.37.0"
 
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-load-balancer-controller"
-#   namespace  = "${var.environment}"
-#   version    = "1.7.2"
+  set {
+    name  = "rbac.serviceAccount.name"
+    value = "cluster-autoscaler"
+  }
 
-#   set {
-#     name  = "clusterName"
-#     value = aws_eks_cluster.eks.name
-#   }
+  set {
+    name  = "autoDiscovery.clusterName"
+    value = aws_eks_cluster.eks.name
+  }
 
-#   set {
-#     name  = "serviceAccount.name"
-#     value = "aws-load-balancer-controller"
-#   }
+  # MUST be updated to match your region 
+  set {
+    name  = "awsRegion"
+    value = "us-east-1"
+  }
 
-#   depends_on = [helm_release.cluster_autoscaler]
-# }
+  depends_on = [helm_release.metrics_server]
+}
+
+
+#-------------------LOADBALANCER------------------
+
+data "aws_iam_policy_document" "aws_lbc" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
+}
+
+resource "aws_iam_role" "aws_lbc" {
+  name               = "${aws_eks_cluster.eks.name}-aws-lbc"
+  assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
+}
+
+resource "aws_iam_policy" "aws_lbc" {
+  policy = file("./iam/AWSLoadBalancerController.json")
+  name   = "AWSLoadBalancerController"
+}
+
+resource "aws_iam_role_policy_attachment" "aws_lbc" {
+  policy_arn = aws_iam_policy.aws_lbc.arn
+  role       = aws_iam_role.aws_lbc.name
+}
+
+resource "aws_eks_pod_identity_association" "aws_lbc" {
+  cluster_name    = aws_eks_cluster.eks.name
+  namespace       = "sb"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.aws_lbc.arn
+}
+
+resource "helm_release" "aws_lbc" {
+  name = "aws-load-balancer-controller"
+
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "sb"
+  version    = "1.7.2"
+
+  set {
+    name  = "clusterName"
+    value = aws_eks_cluster.eks.name
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+
+  depends_on = [helm_release.cluster_autoscaler]
+}
