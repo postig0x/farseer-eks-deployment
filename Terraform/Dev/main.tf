@@ -19,8 +19,6 @@ terraform {
 }
 
 
-data "aws_caller_identity" "current" {}
-
 module "VPC" {
   source      = "./modules/VPC"
   environment = var.environment
