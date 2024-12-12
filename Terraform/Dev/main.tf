@@ -24,4 +24,8 @@ module "EC2" {
   private_subnet_id = module.VPC.private_subnet_id
   instance_type     = var.instance_type
   key_name          = var.key_name
+  # dev_key = var.dev_key
+  xai_key = var.XAI_KEY
+  docker_usr = var.DOCKER_CREDS_USR
+  docker_psw = var.DOCKER_CREDS_PSW
 }

@@ -3,15 +3,15 @@ variable "region" {
 }
 
 variable "environment" {
-  description = "Indicates environment (Dev,QA,Prod)"
+  description = "Indicates environment (Dev,sb,Prod)"
   type        = string
-  default     = "dev"
+  default     = "sb"
 }
 
 variable "cidr_block" {
   description = "VPC CIDR Block"
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "10.1.0.0/16"
 }
 
 variable "instance_type" {
@@ -28,23 +28,8 @@ variable "ec2_ami" {
 
 variable "key_name" {
   type    = string
-  default = "dev-ssh-key"
+  default = "sb-ssh-key"
 }
-
-# variable "dev_key" {
-#   sensitive = true
-# }
-
-variable "XAI_KEY" {
-  type = string
-  sensitive = true
-}
-
-variable "DOCKER_CREDS_USR" {
-  type = string
-}
-
-variable "DOCKER_CREDS_PSW" {
-  type = string
-  sensitive = true
-}
+variable "DOCKER_CREDS_USR"{}
+variable "DOCKER_CREDS_PSW" {}
+variable "XAI_KEY" {}
