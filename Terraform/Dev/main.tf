@@ -146,8 +146,17 @@ resource "aws_eks_node_group" "general" {
     max_unavailable = 1
   }
 
+  tags = {
+    Name        = "${var.environment}-eks-node"
+    Environment = "${var.environment}"
+    Project     = "EKS-Cluster"
+    Owner       = "Cloud Bandits"
+  }
+
   labels = {
     role = "general"
+    team = "DevOps"
+    env  = var.environment
   }
 
   depends_on = [
