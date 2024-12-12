@@ -12,6 +12,8 @@ aws eks update-kubeconfig --region us-east-1 --name sb-test
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
 kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
+kubectl apply -f k8s/sb/roles/rbac.yaml
+
 
 # openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 #   -keyout self-signed-cert.key \
