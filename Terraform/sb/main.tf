@@ -447,7 +447,7 @@ resource "aws_iam_role" "aws_lbc" {
 }
 
 resource "aws_iam_policy" "aws_lbc" {
-  policy = file("./iam/AWSLoadBalancerController.json")
+  policy = file("./sb/iam/AWSLoadBalancerController.json")
   name   = "AWSLoadBalancerController"
 }
 
