@@ -13,8 +13,8 @@ kubectl apply -f k8s/dev/roles/dev_role_binding.yaml
 kubectl apply -f k8s/dev/roles/admin_role_binding.yaml
 
 
-kubectl apply -f k8s/dev/secrets.yaml
-kubectl apply -f k8s/dev/backend
-kubectl apply -f k8s/dev/frontend
+# kubectl apply -f k8s/dev/secrets.yaml
+# kubectl apply -f k8s/dev/backend
+# kubectl apply -f k8s/dev/frontend
 
 
