@@ -15,14 +15,9 @@ kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
 kubectl apply -f k8s/sb/roles/rbac.yaml
 
 
-# openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-#   -keyout self-signed-cert.key \
-#   -out self-signed-cert.crt \
-#   -subj "/CN=farseer.cloud/O=self-signed"
-
 kubectl -n sb create secret tls self-signed-cert \
-  --cert=self-signed-cert.crt \
-  --key=self-signed-cert.key
+  --cert=k8s/sb/certs/cert.crt \
+  --key=k8s/sb/certs/cert_key.key
 
 
 
