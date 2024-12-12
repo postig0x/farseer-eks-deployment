@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: sb
+  namespace: qa
 spec:
   replicas: 1
   selector:
@@ -22,7 +22,7 @@ spec:
               containerPort: 3000
           env:
             - name: NODE_ENV
-              value: sb
+              value: qa
             - name: REACT_APP_BACKEND_URL
               value: http://backend:8000
           resources:
