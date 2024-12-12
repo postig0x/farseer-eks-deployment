@@ -7,8 +7,15 @@ SUBNET_IDS=$(cd Terraform/sb && terraform output  -json private_ips | jq -r 'joi
 echo $SUBNET_IDS
 
 # kubectl wait --for=condition=ready nodes --all --timeout=300s
-kubectl apply -f k8s/sb/dev_role_binding.yaml
-kubectl apply -f k8s/sb/admin_role_binding.yaml
+kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
+kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
+
+# aws eks update-kubeconfig --name sb-test --region us-east-1 --profile developer
+# kubectl config view --minify
+# kubectl get pods
+# kubectl get nodes
+# aws eks update-kubeconfig --name sb-test --region us-east-1
+
 
 # # Associate IAM OIDC provider
 # eksctl utils associate-iam-oidc-provider --region=us-east-1 --cluster=sb-test --approve
