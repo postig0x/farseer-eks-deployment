@@ -172,7 +172,7 @@ resource "aws_eks_node_group" "general" {
 }
 
 resource "aws_iam_user" "developer" {
-  name = "eks-developer"
+  name = "developer"
 }
 
 # Will need to look at how to make this so this doesn't error out 
@@ -265,7 +265,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "eks-manager"
+  name = "manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
@@ -332,7 +332,7 @@ resource "helm_release" "metrics_server" {
 }
 
 
-# --------------Install addon first---------------------------
+# --------------POD Idenetity Addon---------------------------
 resource "aws_eks_addon" "pod_identity" {
   cluster_name  = aws_eks_cluster.eks.name
   addon_name    = "eks-pod-identity-agent"
