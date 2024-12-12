@@ -10,6 +10,7 @@ metadata:
     # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
 spec:
   ingressClassName: alb
+  type: LoadBalancer
   rules:
   - http:
       paths:
