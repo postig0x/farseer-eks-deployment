@@ -254,72 +254,72 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
   policy_arn = aws_iam_policy.eks_admin.arn
 }
 
-# resource "aws_iam_user" "manager" {
-#   name = "manager"
-# }
+resource "aws_iam_user" "manager" {
+  name = "manager"
+}
 
-# resource "aws_iam_policy" "eks_assume_admin" {
-#   name = "AmazonEKSAssumeAdminPolicy"
+resource "aws_iam_policy" "eks_assume_admin" {
+  name = "AmazonEKSAssumeAdminPolicy"
 
-#   policy = <<POLICY
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "sts:AssumeRole"
-#             ],
-#             "Resource": "${aws_iam_role.eks_admin.arn}"
-#         }
-#     ]
-# }
-# POLICY
-# }
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Resource": "${aws_iam_role.eks_admin.arn}"
+        }
+    ]
+}
+POLICY
+}
 
-# resource "aws_iam_user_policy_attachment" "manager" {
-#   user       = aws_iam_user.manager.name
-#   policy_arn = aws_iam_policy.eks_assume_admin.arn
-# }
+resource "aws_iam_user_policy_attachment" "manager" {
+  user       = aws_iam_user.manager.name
+  policy_arn = aws_iam_policy.eks_assume_admin.arn
+}
 
-# # Best practice: use IAM roles due to temporary credentials
-# resource "aws_eks_access_entry" "manager" {
-#   cluster_name      = aws_eks_cluster.eks.name
-#   principal_arn     = aws_iam_role.eks_admin.arn
-#   kubernetes_groups = ["my-admin"]
-# }
+# Best practice: use IAM roles due to temporary credentials
+resource "aws_eks_access_entry" "manager" {
+  cluster_name      = aws_eks_cluster.eks.name
+  principal_arn     = aws_iam_role.eks_admin.arn
+  kubernetes_groups = ["my-admin"]
+}
 
 
-# #---------------HPA----------------------------
+#---------------HPA----------------------------
 
-# data "aws_eks_cluster" "eks" {
-#   name = aws_eks_cluster.eks.name
-# }
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.eks.name
+}
 
-# data "aws_eks_cluster_auth" "eks" {
-#   name = aws_eks_cluster.eks.name
-# }
+data "aws_eks_cluster_auth" "eks" {
+  name = aws_eks_cluster.eks.name
+}
 
-# provider "helm" {
-#   kubernetes {
-#     host                   = data.aws_eks_cluster.eks.endpoint
-#     cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-#     token                  = data.aws_eks_cluster_auth.eks.token
-#   }
-# }
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.eks.token
+  }
+}
 
-# resource "helm_release" "metrics_server" {
-#   name = "metrics-server"
+resource "helm_release" "metrics_server" {
+  name = "metrics-server"
 
-#   repository = "https://kubernetes-sigs.github.io/metrics-server/"
-#   chart      = "metrics-server"
-#   namespace  = "sb"
-#   version    = "3.12.1"
+  repository = "https://kubernetes-sigs.github.io/metrics-server/"
+  chart      = "metrics-server"
+  namespace  = "sb"
+  version    = "3.12.1"
 
-#   values = [file("${path.module}/values/metrics-server.yaml")]
+  values = [file("${path.module}/values/metrics-server.yaml")]
 
-#   depends_on = [aws_eks_node_group.general]
-# }
+  depends_on = [aws_eks_node_group.general]
+}
 
 
 # #--------------Cluster Autoscaler---------------------------
