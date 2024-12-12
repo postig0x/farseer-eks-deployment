@@ -339,7 +339,7 @@ resource "aws_eks_addon" "pod_identity" {
   addon_version = "v1.2.0-eksbuild.1"
 }
 
------------------Cluster Autoscaler---------------------
+# -----------------Cluster Autoscaler---------------------
 resource "aws_iam_role" "cluster_autoscaler" {
   name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
