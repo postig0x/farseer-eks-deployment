@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "environment" {
-  description = "Indicates environment (Dev,QA,Prod)"
+  description = "Indicates environment (Dev,sb,Prod)"
   type        = string
   default     = "dev"
 }
@@ -28,23 +28,8 @@ variable "ec2_ami" {
 
 variable "key_name" {
   type    = string
-  default = "dev-ssh-key"
+  default = "${var.environment}-ssh-key"
 }
-
-# variable "dev_key" {
-#   sensitive = true
-# }
-
-variable "XAI_KEY" {
-  type = string
-  sensitive = true
-}
-
-variable "DOCKER_CREDS_USR" {
-  type = string
-}
-
-variable "DOCKER_CREDS_PSW" {
-  type = string
-  sensitive = true
-}
+variable "DOCKER_CREDS_USR"{}
+variable "DOCKER_CREDS_PSW" {}
+variable "XAI_KEY" {}

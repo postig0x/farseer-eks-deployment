@@ -1,10 +1,11 @@
-apiVersion: app/v1
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: qa
+  namespace: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -17,17 +18,17 @@ spec:
         - name: frontend
           image: cloudbandits/farseer_front:latest
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3000
           env:
             - name: NODE_ENV
-              value: qa
+              value: dev
             - name: REACT_APP_BACKEND_URL
               value: http://backend:8000
           resources:
             requests:
+              memory: 128Mi
               cpu: 100m
-              memory: 256Mi
             limits:
-              cpu: 200m
-              memory: 512Mi
-      restartPolicy: Always
+              memory: 128Mi
+              cpu: 100m
