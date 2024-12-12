@@ -290,7 +290,7 @@ resource "aws_eks_access_entry" "manager" {
 }
 
 
----------------HPA----------------------------
+# ---------------HPA----------------------------
 
 data "aws_eks_cluster" "eks" {
   name = aws_eks_cluster.eks.name
