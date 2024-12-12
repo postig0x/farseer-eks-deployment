@@ -316,7 +316,7 @@ resource "helm_release" "metrics_server" {
   namespace  = "kube-system"
   version    = "3.12.1"
 
-  values = [file("${path.module}/sb/values/metrics-server.yaml")]
+  values = [file("${path.module}/values/metrics-server.yaml")]
 
   depends_on = [aws_eks_node_group.general]
 }
