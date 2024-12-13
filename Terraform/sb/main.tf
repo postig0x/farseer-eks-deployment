@@ -177,7 +177,7 @@ resource "aws_eks_node_group" "general" {
   }
 }
 
-resource "kubernetes_namespace" "example_namespace" {
+resource "kubernetes_namespace" "namespace" {
   metadata {
     name = "sb"
   }
@@ -339,7 +339,10 @@ resource "helm_release" "metrics_server" {
 
   values = [file("${path.module}/values/metrics-server.yaml")]
 
-  depends_on = [aws_eks_node_group.general]
+  depends_on = [
+    aws_eks_node_group.general,
+    kubernetes_namespace.namespace
+  ]
 }
 
 
@@ -440,7 +443,10 @@ resource "helm_release" "cluster_autoscaler" {
     value = "us-east-1"
   }
 
-  depends_on = [helm_release.metrics_server]
+  depends_on = [
+    helm_release.metrics_server,
+    kubernetes_namespace.namespace
+    ]
 }
 
 
@@ -502,5 +508,8 @@ resource "helm_release" "aws_lbc" {
     value = "aws-load-balancer-controller"
   }
 
-  depends_on = [helm_release.cluster_autoscaler]
+  depends_on = [
+    helm_release.cluster_autoscaler,
+    kubernetes_namespace.namespace
+  ]
 }
