@@ -162,6 +162,12 @@ resource "aws_eks_node_group" "general" {
   }
 }
 
+resource "kubernetes_namespace" "example_namespace" {
+  metadata {
+    name = "sb"
+  }
+}
+
 resource "aws_iam_user" "developer" {
   name = "developer"
 }
