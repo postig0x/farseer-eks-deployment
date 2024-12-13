@@ -22,7 +22,7 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.49"
     }
-     kubernetes = {
+    kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.27"
     }
@@ -142,10 +142,10 @@ resource "aws_eks_node_group" "general" {
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
-      module.VPC.private_subnet_id1,
-      module.VPC.private_subnet_id2,
-      module.VPC.private_subnet_id3,
-      module.VPC.private_subnet_id4
+    module.VPC.private_subnet_id1,
+    module.VPC.private_subnet_id2,
+    module.VPC.private_subnet_id3,
+    module.VPC.private_subnet_id4
   ]
 
   capacity_type  = "ON_DEMAND"
@@ -179,10 +179,10 @@ resource "aws_eks_node_group" "general" {
 
 resource "kubernetes_namespace" "namespace" {
   metadata {
-    name = "${var.environment}"
+    name = var.environment
   }
 
-  depends_on = [ kubernetes ]
+  depends_on = [kubernetes]
 }
 
 resource "aws_iam_user" "developer" {
@@ -336,7 +336,7 @@ resource "helm_release" "metrics_server" {
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
-  namespace  = "${var.environment}"
+  namespace  = var.environment
   version    = "3.12.1"
 
   values = [file("${path.module}/values/metrics-server.yaml")]
@@ -416,7 +416,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = var.environment
   service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
@@ -426,7 +426,7 @@ resource "helm_release" "cluster_autoscaler" {
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  namespace  = "${var.environment}"
+  namespace  = var.environment
   version    = "9.37.0"
 
   set {
@@ -448,7 +448,7 @@ resource "helm_release" "cluster_autoscaler" {
   depends_on = [
     helm_release.metrics_server,
     kubernetes_namespace.namespace
-    ]
+  ]
 }
 
 
@@ -487,7 +487,7 @@ resource "aws_iam_role_policy_attachment" "aws_lbc" {
 
 resource "aws_eks_pod_identity_association" "aws_lbc" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = var.environment
   service_account = "aws-load-balancer-controller"
   role_arn        = aws_iam_role.aws_lbc.arn
 }
@@ -497,7 +497,7 @@ resource "helm_release" "aws_lbc" {
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "${var.environment}"
+  namespace  = var.environment
   version    = "1.7.2"
 
   set {
