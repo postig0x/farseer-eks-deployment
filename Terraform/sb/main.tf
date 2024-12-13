@@ -467,7 +467,7 @@ resource "aws_eks_pod_identity_association" "aws_lbc" {
   role_arn        = aws_iam_role.aws_lbc.arn
 
   depends_on = [
-    aws_iam_policy_attachment.aws_lbc
+    aws_iam_role_policy_attachment.aws_lbc
   ]
 }
 
