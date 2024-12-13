@@ -100,7 +100,7 @@ pipeline {
                         ./k8s/prod/prod_k8s_setup.sh $XAI_KEY
                       '''
                     }
-                } else if (env.BRANCH_NAME == 'qa') {
+                } else if (env.BRANCH_NAME.startsWith('qa')) {
                     echo "Deploying to QA Environment"
                     dir('Terraform/QA') { // Navigate to the staging environment directory
                         sh '''
