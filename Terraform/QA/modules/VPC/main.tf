@@ -80,6 +80,8 @@ resource "aws_subnet" "public-subnet1" {
 
   tags = {
     Name = "${var.environment}-public-subnet1"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -91,6 +93,8 @@ resource "aws_subnet" "public-subnet2" {
 
   tags = {
     Name = "${var.environment}-public-subnet2"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -134,6 +138,8 @@ resource "aws_subnet" "private-subnet1" {
   availability_zone = "us-east-1a"
   tags = {
     Name = "${var.environment}-private-subnet1"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -143,6 +149,8 @@ resource "aws_subnet" "private-subnet2" {
   availability_zone = "us-east-1b"
   tags = {
     Name = "${var.environment}-private-subnet2"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -152,6 +160,8 @@ resource "aws_subnet" "private-subnet3" {
   availability_zone = "us-east-1a"
   tags = {
     Name = "${var.environment}-private-subnet3"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -161,6 +171,8 @@ resource "aws_subnet" "private-subnet4" {
   availability_zone = "us-east-1b"
   tags = {
     Name = "${var.environment}-private-subnet4"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 #Private Route Tables
