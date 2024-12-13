@@ -128,7 +128,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve
+                          terraform destroy -auto-approve
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
