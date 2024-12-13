@@ -7,6 +7,13 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
+# Configure the Kubernetes provider
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
+
 terraform {
   required_version = ">= 1.0"
 
@@ -14,6 +21,14 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.49"
+    }
+     kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.27"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12"
     }
   }
 }
