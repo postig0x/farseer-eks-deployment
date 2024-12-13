@@ -11,7 +11,7 @@ echo $SUBNET_IDS
 # kubectl create namespace sb || echo "Namespace sb already exists"
 # kubectl config set-context --current --namespace=sb
 
-
+kubectl apply -f k8s/sb/roles/cluster_role_sb.yaml
 kubectl apply -f k8s/sb/roles/dev_role_binding.yaml
 # kubectl apply -f k8s/sb/roles/admin_role_binding.yaml
 
