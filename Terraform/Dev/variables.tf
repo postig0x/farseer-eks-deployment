@@ -7,6 +7,11 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+variable "stacking" {
+  description = "Indicates environment (Dev,sb,Prod)"
+  type        = string
+  default     = "green"
+}
 
 variable "cidr_block" {
   description = "VPC CIDR Block"

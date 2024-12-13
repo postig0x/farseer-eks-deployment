@@ -41,6 +41,7 @@ module "VPC" {
   source      = "./modules/VPC"
   environment = var.environment
   cidr_block  = var.cidr_block
+  stacking = var.stacking
 }
 
 
@@ -54,7 +55,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster"
+  name = "${var.environment}-$var.stacking}-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -77,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test"
+  name     = "${var.environment}-$var.stacking}"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -102,7 +103,7 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name = "${var.environment}-test-eks-nodes-role"
+  name = "${var.environment}-$var.stacking}-eks-nodes-role"
 
   assume_role_policy = <<POLICY
 {
@@ -139,7 +140,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodes"
+  node_group_name = "${var.environment}-$var.stacking}-general-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -163,7 +164,7 @@ resource "aws_eks_node_group" "general" {
   }
 
   labels = {
-    role = "${var.environment}-general-nodes"
+    role = "${var.environment}-$var.stacking}-general-nodes"
   }
 
   depends_on = [
@@ -180,16 +181,16 @@ resource "aws_eks_node_group" "general" {
 
 resource "kubernetes_namespace" "namespace" {
   metadata {
-    name = "${var.environment}"
+    name = "${var.environment}-$var.stacking}"
   }
 }
 
 resource "aws_iam_user" "developer" {
-  name = "${var.environment}-developer"
+  name = "${var.environment}-$var.stacking}-developer"
 }
 
 resource "aws_iam_policy" "developer_eks" {
-  name = "${var.environment}-AmazonEKSDeveloperPolicy"
+  name = "${var.environment}-$var.stacking}-AmazonEKSDeveloperPolicy"
 
   policy = <<POLICY
 {
@@ -224,7 +225,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "${var.environment}-test-eks-admin-role"
+  name = "${var.environment}-$var.stacking}-eks-admin-role"
 
   assume_role_policy = <<POLICY
 {
@@ -243,7 +244,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "eks_admin" {
-  name = "${var.environment}-AmazonEKSAdminPolicy"
+  name = "${var.environment}-$var.stacking}-AmazonEKSAdminPolicy"
 
   policy = <<POLICY
 {
@@ -277,11 +278,11 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "${var.environment}-manager"
+  name = "${var.environment}-$var.stacking}-manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
-  name = "${var.environment}-AmazonEKSAssumeAdminPolicy"
+  name = "${var.environment}-$var.stacking}-AmazonEKSAssumeAdminPolicy"
 
   policy = <<POLICY
 {
@@ -335,7 +336,7 @@ resource "helm_release" "metrics_server" {
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
-  namespace  = "${var.environment}"
+  namespace  = "${var.environment}-$var.stacking}"
   version    = "3.12.1"
 
   values = [file("${path.module}/values/metrics-server.yaml")]
@@ -415,17 +416,17 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = "${var.environment}-$var.stacking}"
   service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  name = "${var.environment}-autoscaler"
+  name = "${var.environment}-$var.stacking}-autoscaler"
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  namespace  = "${var.environment}"
+  namespace  = "${var.environment}-$var.stacking}"
   version    = "9.37.0"
 
   set {
@@ -476,7 +477,7 @@ resource "aws_iam_role" "aws_lbc" {
 
 resource "aws_iam_policy" "aws_lbc" {
   policy = file("./iam/AWSLoadBalancerController.json")
-  name   = "${var.environment}-AWSLoadBalancerController"
+  name   = "${var.environment}-$var.stacking}-AWSLoadBalancerController"
 }
 
 resource "aws_iam_role_policy_attachment" "aws_lbc" {
@@ -486,17 +487,17 @@ resource "aws_iam_role_policy_attachment" "aws_lbc" {
 
 resource "aws_eks_pod_identity_association" "aws_lbc" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = "${var.environment}-$var.stacking}"
   service_account = "aws-load-balancer-controller"
   role_arn        = aws_iam_role.aws_lbc.arn
 }
 
 resource "helm_release" "aws_lbc" {
-  name = "${var.environment}-aws-load-balancer-controller"
+  name = "${var.environment}-$var.stacking}-aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "${var.environment}"
+  namespace  = "${var.environment}-$var.stacking}"
   version    = "1.7.2"
 
   set {

@@ -8,7 +8,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = {
-    Name = "${var.environment}_VPC"
+    Name = "${var.environment}-$var.stacking_VPC"
   }
 }
 #######################################################################
@@ -20,7 +20,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "${var.environment}_igw"
+    Name = "${var.environment}-$var.stacking_igw"
   }
 }
 
@@ -30,7 +30,7 @@ resource "aws_eip" "nat_eip1" {
   domain = "vpc"
 
   tags = {
-    Name = "${var.environment}-nat-eip1"
+    Name = "${var.environment}-$var.stacking-nat-eip1"
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_eip" "nat_eip2" {
   domain = "vpc"
 
   tags = {
-    Name = "${var.environment}-nat-eip2"
+    Name = "${var.environment}-$var.stacking-nat-eip2"
   }
 }
 
@@ -51,7 +51,7 @@ resource "aws_nat_gateway" "nat_gw1" {
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name = "${var.environment}-natgw1"
+    Name = "${var.environment}-$var.stacking-natgw1"
   }
 }
 
@@ -62,7 +62,7 @@ resource "aws_nat_gateway" "nat_gw2" {
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name = "${var.environment}-natgw2"
+    Name = "${var.environment}-$var.stacking-natgw2"
   }
 }
 
@@ -80,9 +80,9 @@ resource "aws_subnet" "public-subnet1" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                             = "${var.environment}-public-subnet1"
+    Name                             = "${var.environment}-$var.stacking-public-subnet1"
     "kubernetes.io/role/elb"         = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}" = "owned"
   }
 }
 
@@ -93,9 +93,9 @@ resource "aws_subnet" "public-subnet2" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                             = "${var.environment}-public-subnet2"
+    Name                             = "${var.environment}-$var.stacking-public-subnet2"
     "kubernetes.io/role/elb"         = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}" = "owned"
   }
 }
 
@@ -116,7 +116,7 @@ resource "aws_route_table" "public-rt" {
 
 
   tags = {
-    Name = "${var.environment}_public_route_table"
+    Name = "${var.environment}-$var.stacking_public_route_table"
   }
 }
 
@@ -138,9 +138,9 @@ resource "aws_subnet" "private-subnet1" {
   cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1a"
   tags = {
-    Name                              = "${var.environment}-private-subnet1"
+    Name                              = "${var.environment}-$var.stacking-private-subnet1"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test"  = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
   }
 }
 
@@ -149,9 +149,9 @@ resource "aws_subnet" "private-subnet2" {
   cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1b"
   tags = {
-    Name                              = "${var.environment}-private-subnet2"
+    Name                              = "${var.environment}-$var.stacking-private-subnet2"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test"  = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
   }
 }
 
@@ -160,9 +160,9 @@ resource "aws_subnet" "private-subnet3" {
   cidr_block        = "10.0.4.0/24"
   availability_zone = "us-east-1a"
   tags = {
-    Name                              = "${var.environment}-private-subnet3"
+    Name                              = "${var.environment}-$var.stacking-private-subnet3"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test"  = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
   }
 }
 
@@ -171,9 +171,9 @@ resource "aws_subnet" "private-subnet4" {
   cidr_block        = "10.0.5.0/24"
   availability_zone = "us-east-1b"
   tags = {
-    Name                              = "${var.environment}-private-subnet4"
+    Name                              = "${var.environment}-$var.stacking-private-subnet4"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test"  = "owned"
+    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
   }
 }
 #Private Route Tables
@@ -191,7 +191,7 @@ resource "aws_route_table" "private-rt1" {
   }
 
   tags = {
-    Name = "${var.environment}_private_route_table"
+    Name = "${var.environment}-$var.stacking_private_route_table"
   }
 }
 
@@ -208,7 +208,7 @@ resource "aws_route_table" "private-rt2" {
   }
 
   tags = {
-    Name = "${var.environment}_private_route_table"
+    Name = "${var.environment}-$var.stacking_private_route_table"
   }
 }
 
@@ -240,7 +240,7 @@ resource "aws_vpc_peering_connection" "peering" {
   vpc_id      = data.aws_vpc.default.id
   auto_accept = true
   tags = {
-    Name = "${var.environment}_vpc_peering"
+    Name = "${var.environment}-$var.stacking_vpc_peering"
   }
 }
 
