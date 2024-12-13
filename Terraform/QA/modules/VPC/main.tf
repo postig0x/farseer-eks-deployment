@@ -74,7 +74,7 @@ resource "aws_nat_gateway" "nat_gw2" {
 
 resource "aws_subnet" "public-subnet1" {
   vpc_id = aws_vpc.vpc.id
-  cidr_block = "10.1.0.0/24"
+  cidr_block = "10.2.0.0/24"
   availability_zone = "us-east-1a"
   map_public_ip_on_launch = true
 
@@ -85,7 +85,7 @@ resource "aws_subnet" "public-subnet1" {
 
 resource "aws_subnet" "public-subnet2" {
   vpc_id = aws_vpc.vpc.id
-  cidr_block = "10.1.1.0/24"
+  cidr_block = "10.2.1.0/24"
   availability_zone = "us-east-1b"
   map_public_ip_on_launch = true
 
@@ -130,7 +130,7 @@ resource "aws_route_table_association" "pub-rt-association2" {
 #############################################################################
 resource "aws_subnet" "private-subnet1" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.1.2.0/24"
+  cidr_block        = "10.2.2.0/24"
   availability_zone = "us-east-1a"
   tags = {
     Name = "${var.environment}-private-subnet1"
@@ -139,7 +139,7 @@ resource "aws_subnet" "private-subnet1" {
 
 resource "aws_subnet" "private-subnet2" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.1.3.0/24"
+  cidr_block        = "10.2.3.0/24"
   availability_zone = "us-east-1b"
   tags = {
     Name = "${var.environment}-private-subnet2"
@@ -148,7 +148,7 @@ resource "aws_subnet" "private-subnet2" {
 
 resource "aws_subnet" "private-subnet3" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.1.4.0/24"
+  cidr_block        = "10.2.4.0/24"
   availability_zone = "us-east-1a"
   tags = {
     Name = "${var.environment}-private-subnet3"
@@ -157,7 +157,7 @@ resource "aws_subnet" "private-subnet3" {
 
 resource "aws_subnet" "private-subnet4" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = "10.1.5.0/24"
+  cidr_block        = "10.2.5.0/24"
   availability_zone = "us-east-1b"
   tags = {
     Name = "${var.environment}-private-subnet4"

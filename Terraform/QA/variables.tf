@@ -11,7 +11,7 @@ variable "environment" {
 variable "cidr_block" {
   description = "VPC CIDR Block"
   type        = string
-  default     = "10.1.0.0/16"
+  default     = "10.2.0.0/16"
 }
 
 variable "instance_type" {
