@@ -7,6 +7,13 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
+# Configure the Kubernetes provider
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
+
 terraform {
   required_version = ">= 1.0"
 
@@ -14,6 +21,14 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.49"
+    }
+     kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.27"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12"
     }
   }
 }
@@ -38,7 +53,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster-role"
+  name = "${var.environment}-test-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -61,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test-eks-cluster"
+  name     = "${var.environment}-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -123,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodegroup"
+  node_group_name = "${var.environment}-general-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -146,17 +161,8 @@ resource "aws_eks_node_group" "general" {
     max_unavailable = 1
   }
 
-  tags = {
-    Name        = "${var.environment}-eks-node"
-    Environment = "${var.environment}"
-    Project     = "EKS-Cluster"
-    Owner       = "Cloud Bandits"
-  }
-
   labels = {
-    role = "general"
-    team = "DevOps"
-    env  = var.environment
+    role = "${var.environment}-eks-nodes"
   }
 
   depends_on = [
@@ -171,133 +177,138 @@ resource "aws_eks_node_group" "general" {
   }
 }
 
-# resource "aws_iam_user" "developer" {
-#   name = "eks-developer"
-# }
+resource "kubernetes_namespace" "namespace" {
+  metadata {
+    name = "${var.environment}"
+  }
+}
 
-# # Will need to look at how to make this so this doesn't error out 
-# resource "aws_iam_policy" "developer_eks" {
-#   name = "AmazonEKSDeveloperPolicy"
+resource "aws_iam_user" "developer" {
+  name = "${var.environment}-developer"
+}
 
-#   policy = <<POLICY
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "eks:DescribeCluster",
-#                 "eks:ListClusters"
-#             ],
-#             "Resource": "*"
-#         }
-#     ]
-# }
-# POLICY
-# }
+resource "aws_iam_policy" "developer_eks" {
+  name = "AmazonEKSDeveloperPolicy"
 
-# resource "aws_iam_user_policy_attachment" "developer_eks" {
-#   user       = aws_iam_user.developer.name
-#   policy_arn = aws_iam_policy.developer_eks.arn
-# }
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "eks:DescribeCluster",
+                "eks:ListClusters"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+POLICY
+}
 
-# resource "aws_eks_access_entry" "developer" {
-#   cluster_name      = aws_eks_cluster.eks.name
-#   principal_arn     = aws_iam_user.developer.arn
-#   kubernetes_groups = ["eks-my-viewer"]
-# }
+resource "aws_iam_user_policy_attachment" "developer_eks" {
+  user       = aws_iam_user.developer.name
+  policy_arn = aws_iam_policy.developer_eks.arn
+}
+
+resource "aws_eks_access_entry" "developer" {
+  cluster_name      = aws_eks_cluster.eks.name
+  principal_arn     = aws_iam_user.developer.arn
+  kubernetes_groups = ["my-viewer"]
+}
 
 
-# #---------------------MANAGER--------------
-# data "aws_caller_identity" "current" {}
+#---------------------MANAGER--------------
+data "aws_caller_identity" "current" {}
 
-# resource "aws_iam_role" "eks_admin" {
-#   name = "eks-admin"
+resource "aws_iam_role" "eks_admin" {
+  name = "${var.environment}-test-eks-admin-role"
 
-#   assume_role_policy = <<POLICY
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": "sts:AssumeRole",
-#       "Principal": {
-#         "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-#       }
-#     }
-#   ]
-# }
-# POLICY
-# }
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      }
+    }
+  ]
+}
+POLICY
+}
 
-# resource "aws_iam_policy" "eks_admin" {
-#   name = "AmazonEKSAdminPolicy"
+resource "aws_iam_policy" "eks_admin" {
+  name = "AmazonEKSAdminPolicy"
 
-#   policy = <<POLICY
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "eks:*"
-#             ],
-#             "Resource": "*"
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": "iam:PassRole",
-#             "Resource": "*",
-#             "Condition": {
-#                 "StringEquals": {
-#                     "iam:PassedToService": "eks.amazonaws.com"
-#                 }
-#             }
-#         }
-#     ]
-# }
-# POLICY
-# }
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "eks:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": "eks.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+POLICY
+}
 
-# resource "aws_iam_role_policy_attachment" "eks_admin" {
-#   role       = aws_iam_role.eks_admin.name
-#   policy_arn = aws_iam_policy.eks_admin.arn
-# }
+resource "aws_iam_role_policy_attachment" "eks_admin" {
+  role       = aws_iam_role.eks_admin.name
+  policy_arn = aws_iam_policy.eks_admin.arn
+}
 
-# resource "aws_iam_user" "manager" {
-#   name = "eks-manager"
-# }
+resource "aws_iam_user" "manager" {
+  name = "${var.environment}-manager"
+}
 
-# resource "aws_iam_policy" "eks_assume_admin" {
-#   name = "AmazonEKSAssumeAdminPolicy"
+resource "aws_iam_policy" "eks_assume_admin" {
+  name = "AmazonEKSAssumeAdminPolicy"
 
-#   policy = <<POLICY
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                 "sts:AssumeRole"
-#             ],
-#             "Resource": "${aws_iam_role.eks_admin.arn}"
-#         }
-#     ]
-# }
-# POLICY
-# }
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Resource": "${aws_iam_role.eks_admin.arn}"
+        }
+    ]
+}
+POLICY
+}
 
-# resource "aws_iam_user_policy_attachment" "manager" {
-#   user       = aws_iam_user.manager.name
-#   policy_arn = aws_iam_policy.eks_assume_admin.arn
-# }
+resource "aws_iam_user_policy_attachment" "manager" {
+  user       = aws_iam_user.manager.name
+  policy_arn = aws_iam_policy.eks_assume_admin.arn
+}
 
-# # Best practice: use IAM roles due to temporary credentials
-# resource "aws_eks_access_entry" "manager" {
-#   cluster_name      = aws_eks_cluster.eks.name
-#   principal_arn     = aws_iam_role.eks_admin.arn
-#   kubernetes_groups = ["eks-my-admin"]
-# }
+# Best practice: use IAM roles due to temporary credentials
+resource "aws_eks_access_entry" "manager" {
+  cluster_name      = aws_eks_cluster.eks.name
+  principal_arn     = aws_iam_role.eks_admin.arn
+  kubernetes_groups = ["my-admin"]
+}
 
 
 # ---------------HPA----------------------------
@@ -328,7 +339,10 @@ resource "helm_release" "metrics_server" {
 
   values = [file("${path.module}/values/metrics-server.yaml")]
 
-  depends_on = [aws_eks_node_group.general]
+  depends_on = [
+    aws_eks_node_group.general,
+    kubernetes_namespace.namespace
+  ]
 }
 
 
@@ -340,7 +354,7 @@ resource "aws_eks_addon" "pod_identity" {
 }
 
 resource "aws_iam_role" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -360,7 +374,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -401,12 +415,12 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
   namespace       = "${var.environment}"
-  service_account = "${var.environment}-cluster-autoscaler"
+  service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  name = "autoscaler"
+  name = "${var.environment}-autoscaler"
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
@@ -429,7 +443,10 @@ resource "helm_release" "cluster_autoscaler" {
     value = "us-east-1"
   }
 
-  depends_on = [helm_release.metrics_server]
+  depends_on = [
+    helm_release.metrics_server,
+    kubernetes_namespace.namespace
+    ]
 }
 
 
@@ -452,13 +469,13 @@ data "aws_iam_policy_document" "aws_lbc" {
 }
 
 resource "aws_iam_role" "aws_lbc" {
-  name               = "${aws_eks_cluster.eks.name}-aws-lbc"
+  name               = "${aws_eks_cluster.eks.name}-aws-lbc-role"
   assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
 }
 
 resource "aws_iam_policy" "aws_lbc" {
   policy = file("./iam/AWSLoadBalancerController.json")
-  name   = "${var.environment}-AWSLoadBalancerController"
+  name   = "AWSLoadBalancerController"
 }
 
 resource "aws_iam_role_policy_attachment" "aws_lbc" {
@@ -474,7 +491,7 @@ resource "aws_eks_pod_identity_association" "aws_lbc" {
 }
 
 resource "helm_release" "aws_lbc" {
-  name = "aws-load-balancer-controller"
+  name = "${var.environment}-aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
@@ -491,5 +508,8 @@ resource "helm_release" "aws_lbc" {
     value = "aws-load-balancer-controller"
   }
 
-  depends_on = [helm_release.cluster_autoscaler]
+  depends_on = [
+    helm_release.cluster_autoscaler,
+    kubernetes_namespace.namespace
+  ]
 }

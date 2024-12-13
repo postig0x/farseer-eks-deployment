@@ -7,6 +7,13 @@ provider "aws" {
   region = var.region # Specify the AWS region where resources will be created (e.g., us-east-1, us-west-2)
 }
 
+# Configure the Kubernetes provider
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
+
 terraform {
   required_version = ">= 1.0"
 
@@ -15,9 +22,19 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.49"
     }
+     kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.27"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.12"
+    }
   }
 }
 
+
+# data "aws_caller_identity" "current" {}
 
 module "VPC" {
   source      = "./modules/VPC"
@@ -36,7 +53,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster-role"
+  name = "${var.environment}-test-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -59,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test-eks-cluster"
+  name     = "${var.environment}-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -121,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodegroup"
+  node_group_name = "${var.environment}-general-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -145,7 +162,7 @@ resource "aws_eks_node_group" "general" {
   }
 
   labels = {
-    role = "general"
+    role = "${var.environment}-eks-nodes"
   }
 
   depends_on = [
@@ -160,11 +177,16 @@ resource "aws_eks_node_group" "general" {
   }
 }
 
-resource "aws_iam_user" "developer" {
-  name = "developer"
+resource "kubernetes_namespace" "namespace" {
+  metadata {
+    name = "${var.environment}"
+  }
 }
 
-# Will need to look at how to make this so this doesn't error out 
+resource "aws_iam_user" "developer" {
+  name = "${var.environment}-developer"
+}
+
 resource "aws_iam_policy" "developer_eks" {
   name = "AmazonEKSDeveloperPolicy"
 
@@ -193,7 +215,7 @@ resource "aws_iam_user_policy_attachment" "developer_eks" {
 resource "aws_eks_access_entry" "developer" {
   cluster_name      = aws_eks_cluster.eks.name
   principal_arn     = aws_iam_user.developer.arn
-  kubernetes_groups = ["eks-my-viewer"]
+  kubernetes_groups = ["my-viewer"]
 }
 
 
@@ -201,7 +223,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "eks-admin"
+  name = "${var.environment}-test-eks-admin-role"
 
   assume_role_policy = <<POLICY
 {
@@ -254,7 +276,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "manager"
+  name = "${var.environment}-manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
@@ -285,7 +307,7 @@ resource "aws_iam_user_policy_attachment" "manager" {
 resource "aws_eks_access_entry" "manager" {
   cluster_name      = aws_eks_cluster.eks.name
   principal_arn     = aws_iam_role.eks_admin.arn
-  kubernetes_groups = ["eks-my-admin"]
+  kubernetes_groups = ["my-admin"]
 }
 
 
@@ -317,20 +339,22 @@ resource "helm_release" "metrics_server" {
 
   values = [file("${path.module}/values/metrics-server.yaml")]
 
-  depends_on = [aws_eks_node_group.general]
+  depends_on = [
+    aws_eks_node_group.general,
+    kubernetes_namespace.namespace
+  ]
 }
 
 
-# --------------POD Idenetity Addon---------------------------
+#--------------Cluster Autoscaler---------------------------
 resource "aws_eks_addon" "pod_identity" {
   cluster_name  = aws_eks_cluster.eks.name
   addon_name    = "eks-pod-identity-agent"
   addon_version = "v1.2.0-eksbuild.1"
 }
 
-# -----------------Cluster Autoscaler---------------------
 resource "aws_iam_role" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -350,7 +374,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -391,12 +415,12 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
   namespace       = "${var.environment}"
-  service_account = "${var.environment}-cluster-autoscaler"
+  service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  name = "autoscaler"
+  name = "${var.environment}-autoscaler"
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
@@ -419,7 +443,10 @@ resource "helm_release" "cluster_autoscaler" {
     value = "us-east-1"
   }
 
-  depends_on = [helm_release.metrics_server]
+  depends_on = [
+    helm_release.metrics_server,
+    kubernetes_namespace.namespace
+    ]
 }
 
 
@@ -442,7 +469,7 @@ data "aws_iam_policy_document" "aws_lbc" {
 }
 
 resource "aws_iam_role" "aws_lbc" {
-  name               = "${aws_eks_cluster.eks.name}-aws-lbc"
+  name               = "${aws_eks_cluster.eks.name}-aws-lbc-role"
   assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
 }
 
@@ -464,7 +491,7 @@ resource "aws_eks_pod_identity_association" "aws_lbc" {
 }
 
 resource "helm_release" "aws_lbc" {
-  name = "aws-load-balancer-controller"
+  name = "${var.environment}-aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
@@ -481,5 +508,8 @@ resource "helm_release" "aws_lbc" {
     value = "aws-load-balancer-controller"
   }
 
-  depends_on = [helm_release.cluster_autoscaler]
+  depends_on = [
+    helm_release.cluster_autoscaler,
+    kubernetes_namespace.namespace
+  ]
 }
