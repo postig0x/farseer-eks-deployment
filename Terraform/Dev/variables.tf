@@ -30,6 +30,6 @@ variable "key_name" {
   type    = string
   default = "dev-ssh-key"
 }
-variable "DOCKER_CREDS_USR"{}
-variable "DOCKER_CREDS_PSW" {}
-variable "XAI_KEY" {}
+# variable "DOCKER_CREDS_USR"{}
+# variable "DOCKER_CREDS_PSW" {}
+# variable "XAI_KEY" {}
