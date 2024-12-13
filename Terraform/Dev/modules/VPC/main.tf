@@ -232,38 +232,38 @@ resource "aws_route_table_association" "private-rt-association4" {
   route_table_id = aws_route_table.private-rt2.id
 }
 
-##################################################
-### VPC PEERING ###
-##################################################
-resource "aws_vpc_peering_connection" "peering" {
-  peer_vpc_id = aws_vpc.vpc.id
-  vpc_id      = data.aws_vpc.default.id
-  auto_accept = true
-  tags = {
-    Name = "${var.environment}-${var.stacking}_vpc_peering"
-  }
-}
+# ##################################################
+# ### VPC PEERING ###
+# ##################################################
+# resource "aws_vpc_peering_connection" "peering" {
+#   peer_vpc_id = aws_vpc.vpc.id
+#   vpc_id      = data.aws_vpc.default.id
+#   auto_accept = true
+#   tags = {
+#     Name = "${var.environment}-${var.stacking}_vpc_peering"
+#   }
+# }
 
-##################################################
-### DEFAULT VPC ###
-##################################################
-# Setting Default VPC
-data "aws_vpc" "default" {
-  default = true
-}
+# ##################################################
+# ### DEFAULT VPC ###
+# ##################################################
+# # Setting Default VPC
+# data "aws_vpc" "default" {
+#   default = true
+# }
 
-# Data source to access the default route table of the default VPC
-data "aws_route_table" "default" {
-  vpc_id = data.aws_vpc.default.id
-}
+# # Data source to access the default route table of the default VPC
+# data "aws_route_table" "default" {
+#   vpc_id = data.aws_vpc.default.id
+# }
 
-# Add a route for VPC peering to the default route table
-resource "aws_route" "vpc_peering_route" {
-  route_table_id            = data.aws_route_table.default.id
-  destination_cidr_block    = aws_vpc.vpc.cidr_block # Adjust based on peer VPC
-  vpc_peering_connection_id = aws_vpc_peering_connection.peering.id
-  lifecycle {
-    create_before_destroy = true
-    ignore_changes        = [destination_cidr_block]
-  }
-}
+# # Add a route for VPC peering to the default route table
+# resource "aws_route" "vpc_peering_route" {
+#   route_table_id            = data.aws_route_table.default.id
+#   destination_cidr_block    = aws_vpc.vpc.cidr_block # Adjust based on peer VPC
+#   vpc_peering_connection_id = aws_vpc_peering_connection.peering.id
+#   lifecycle {
+#     create_before_destroy = true
+#     ignore_changes        = [destination_cidr_block]
+#   }
+# }
