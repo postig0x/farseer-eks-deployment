@@ -121,7 +121,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform destroy -auto-approve \
+                          terraform apply -auto-approve \
                             -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
                             -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
                             -var XAI_KEY="${XAI_KEY}"
