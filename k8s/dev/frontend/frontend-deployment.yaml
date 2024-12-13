@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: dev
+  namespace: dev-green
 spec:
   replicas: 1
   selector:
