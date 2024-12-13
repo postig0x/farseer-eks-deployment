@@ -390,7 +390,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "sb"
+  namespace       = "kube-system"
   service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
@@ -400,7 +400,7 @@ resource "helm_release" "cluster_autoscaler" {
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  namespace  = "sb"
+  namespace  = "kube-system"
   version    = "9.37.0"
 
   set {
@@ -416,12 +416,11 @@ resource "helm_release" "cluster_autoscaler" {
   # MUST be updated to match your region 
   set {
     name  = "awsRegion"
-    value = "us-east-1"
+    value = "us-east-2"
   }
 
   depends_on = [helm_release.metrics_server]
 }
-
 
 #-------------------LOADBALANCER------------------
 
