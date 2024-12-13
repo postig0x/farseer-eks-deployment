@@ -82,7 +82,7 @@ resource "aws_subnet" "public-subnet1" {
   tags = {
     Name                             = "${var.environment}-${var.stacking}-public-subnet1"
     "kubernetes.io/role/elb"         = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}" = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}" = "owned"
   }
 }
 
@@ -95,7 +95,7 @@ resource "aws_subnet" "public-subnet2" {
   tags = {
     Name                             = "${var.environment}-${var.stacking}-public-subnet2"
     "kubernetes.io/role/elb"         = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}" = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}" = "owned"
   }
 }
 
@@ -140,7 +140,7 @@ resource "aws_subnet" "private-subnet1" {
   tags = {
     Name                              = "${var.environment}-${var.stacking}-private-subnet1"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}"  = "owned"
   }
 }
 
@@ -151,7 +151,7 @@ resource "aws_subnet" "private-subnet2" {
   tags = {
     Name                              = "${var.environment}-${var.stacking}-private-subnet2"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}"  = "owned"
   }
 }
 
@@ -162,7 +162,7 @@ resource "aws_subnet" "private-subnet3" {
   tags = {
     Name                              = "${var.environment}-${var.stacking}-private-subnet3"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}"  = "owned"
   }
 }
 
@@ -173,7 +173,7 @@ resource "aws_subnet" "private-subnet4" {
   tags = {
     Name                              = "${var.environment}-${var.stacking}-private-subnet4"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-$var.stacking}"  = "owned"
+    "kubernetes.io/cluster/dev-${var.stacking}"  = "owned"
   }
 }
 #Private Route Tables
