@@ -101,7 +101,7 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name = "${var.environment}-test-eks-nodes"
+  name = "${var.environment}-test-eks-nodes-role"
 
   assume_role_policy = <<POLICY
 {
@@ -138,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "general"
+  node_group_name = "${var.environment}-general-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -162,7 +162,7 @@ resource "aws_eks_node_group" "general" {
   }
 
   labels = {
-    role = "general"
+    role = "${var.environment}-eks-nodes"
   }
 
   depends_on = [
@@ -184,7 +184,7 @@ resource "kubernetes_namespace" "namespace" {
 }
 
 resource "aws_iam_user" "developer" {
-  name = "developer"
+  name = "${var.environment}-developer"
 }
 
 resource "aws_iam_policy" "developer_eks" {
@@ -223,7 +223,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "${var.environment}-test-eks-admin"
+  name = "${var.environment}-test-eks-admin-role"
 
   assume_role_policy = <<POLICY
 {
@@ -276,7 +276,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "manager"
+  name = "${var.environment}-manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
@@ -354,7 +354,7 @@ resource "aws_eks_addon" "pod_identity" {
 }
 
 resource "aws_iam_role" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -374,7 +374,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -420,7 +420,7 @@ resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  name = "autoscaler"
+  name = "${var.environment}-autoscaler"
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
@@ -469,7 +469,7 @@ data "aws_iam_policy_document" "aws_lbc" {
 }
 
 resource "aws_iam_role" "aws_lbc" {
-  name               = "${aws_eks_cluster.eks.name}-aws-lbc"
+  name               = "${aws_eks_cluster.eks.name}-aws-lbc-role"
   assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
 }
 
@@ -491,7 +491,7 @@ resource "aws_eks_pod_identity_association" "aws_lbc" {
 }
 
 resource "helm_release" "aws_lbc" {
-  name = "aws-load-balancer-controller"
+  name = "${var.environment}-aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
