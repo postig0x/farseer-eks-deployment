@@ -122,16 +122,6 @@ pipeline {
                       '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
-                    echo "Deploying to Dev Test Environment"
-                    dir('Terraform/Dev') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve
-                        '''
-                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
                     echo "Navigating back to the root directory"
                     dir('.') {
                       sh '''
@@ -142,6 +132,17 @@ pipeline {
                         ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
                       '''
                     }
+                    echo "Deploying to Dev Test Environment"
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+                    }
+
                 } else if (env.BRANCH_NAME.startsWith('sb')) {
                     echo "Deploying to SB Test Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
