@@ -71,7 +71,8 @@ pipeline {
     //         }
     //     }
     // }
-    
+                              // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
 
     stage('Deploy') {
         agent { label 'build-node' }
@@ -79,63 +80,88 @@ pipeline {
         steps {
             script {
                 if (env.BRANCH_NAME == 'production') {
-                    echo "Deploying to Production Environment"
-                    dir('Terraform/Production') { // Navigate to the production environment directory
+                    echo "Deploying to Prod Environment"
+                    dir('Terraform/Production') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
                           terraform apply -auto-approve
                         '''
-                          // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+                    }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/prod/prod_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/prod/prod_k8s_setup.sh $XAI_KEY
+                      '''
                     }
                 } else if (env.BRANCH_NAME == 'qa') {
-                    echo "Deploying to Testing Environment"
-                    dir('Terraform/QA') { // Navigate to the qa environment directory
+                    echo "Deploying to QA Environment"
+                    dir('Terraform/QA') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
                           terraform apply -auto-approve
                         '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
-                } else if (env.BRANCH_NAME == 'develop') {
-                    echo "Deploying to Staging Environment"
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/qa/qa_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
+                      '''
+                    }
+                } else if (env.BRANCH_NAME.startsWith('dev')) {
+                    echo "Deploying to Dev Test Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
-                            -var dev_key="${DEV_KEY}" \
-                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
-                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
-                            -var XAI_KEY="${XAI_KEY}"      
-                        '''
-                    }
-                } else if (env.BRANCH_NAME.startsWith('sb')) {
-                    echo "Deploying to Staging Environment"
-                    dir('Terraform/sb') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve \
-                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
-                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
-                            -var XAI_KEY="${XAI_KEY}"
+                          terraform apply -auto-approve
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                  }
+                    }
                     echo "Navigating back to the root directory"
                     dir('.') {
                       sh '''
                         # Ensure script is executable
-                        chmod +x k8s/sb/sb_k8s_setup.sh
+                        chmod +x k8s/dev/dev_k8s_setup.sh
 
                         # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/sb/sb_k8s_setup.sh $XAI_KEY
+                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
+                      '''
+                    }
+
+                } else if (env.BRANCH_NAME.startsWith('sb')) {
+                    echo "Deploying to SB Test Environment"
+                    dir('Terraform/Dev') { // Navigate to the staging environment directory
+                        sh '''
+                          echo "Current working directory:"
+                          pwd
+                          terraform init
+                          terraform apply -auto-approve
+                        '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+                    }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/dev/dev_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
                       '''
                     }
                 } else {
@@ -174,9 +200,4 @@ pipeline {
     }
         }
   
-
-
-
-
-
 

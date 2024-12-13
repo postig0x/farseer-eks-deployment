@@ -2,7 +2,7 @@
 
 # Create Security Group for the Load Balancer
 resource "aws_security_group" "alb_sg" {
-  name        = "sb_alb_sg"
+  name        = "${var.environment}_alb_sg"
   vpc_id     = var.vpc_id
   ingress {
     from_port   = 80
@@ -22,7 +22,7 @@ resource "aws_security_group" "alb_sg" {
 
 #Application Load Balancer 
 resource "aws_lb" "load_balancer" {
-  name               = "sb-load-balancer"
+  name               = "${var.environment}-load-balancer"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -31,14 +31,14 @@ resource "aws_lb" "load_balancer" {
   enable_deletion_protection = false
 
   tags = {
-    Environment = "sb"
+    Environment = "${var.environment}-ALB"
   }
 }
 
 
 #ALB Target Group 
 resource "aws_lb_target_group" "app_tg" {
-  name     = "app-tg"
+  name     = "${var.environment}-app-tg"
   port     = 3000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "app_tg" {
   }
 
   tags = {
-    Name = "sb-alb-target-group"
+    Name = "${var.environment}-alb-target-group"
   }
 }
 

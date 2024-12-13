@@ -32,7 +32,7 @@ resource "aws_security_group" "bastion_sg" {
 #Prod App Server Security Groups
 #Prod-Frontend-SG
 resource "aws_security_group" "frontend_sg1" {
-  name        = "sb-frontend-private-subnet1"
+  name        = "${var.environment}-frontend-private-subnet1"
   description = "Security group for frontend servers"
   vpc_id      = var.vpc_id
 
@@ -68,7 +68,7 @@ resource "aws_security_group" "frontend_sg1" {
 }
 
 resource "aws_security_group" "frontend_sg2" {
-  name        = "sb-frontend-private-subnet2"
+  name        = "${var.environment}-frontend-private-subnet2"
   description = "Security group for frontend servers"
   vpc_id      = var.vpc_id
 
@@ -105,7 +105,7 @@ resource "aws_security_group" "frontend_sg2" {
 
 #backend-SG-AZ1
 resource "aws_security_group" "backend_sg1" {
-  name        = "prod-backend-private-subnet-sg1"
+  name        = "${var.environment}-backend-private-subnet-sg1"
   description = "Security group for backend servers"
   vpc_id      = var.vpc_id
 
@@ -143,7 +143,7 @@ resource "aws_security_group" "backend_sg1" {
 }
 
 resource "aws_security_group" "backend_sg2" {
-  name        = "prod-backend-private-subnet-sg2"
+  name        = "${var.environment}-backend-private-subnet-sg2"
   description = "Security group for backend servers"
   vpc_id      = var.vpc_id
 

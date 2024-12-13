@@ -5,5 +5,7 @@ variable "vpc_id" {
 variable "private_subnet_id1"{}
 variable "private_subnet_id2"{}
 
+variable "environment"{}
+
 variable "frontend1"{}
 variable "frontend2"{}

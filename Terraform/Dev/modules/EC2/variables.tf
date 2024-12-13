@@ -1,5 +1,5 @@
 variable "environment" {
-  description = "Indicates environment (Dev,QA,Prod)"
+  description = "Indicates environment (Dev,sb,Prod)"
   type        = string
 }
 
@@ -14,16 +14,12 @@ variable "ec2_ami" {
 }
 
 variable "vpc_id" {}
-
-variable "public_subnet_id" {}
-
-variable "private_subnet_id" {}
-#variable "dev_key" {}
-variable "docker_usr"{}
-variable "docker_psw" {}
-variable "xai_key" {}
-
-
+variable "public_subnet_id1" {}
+variable "public_subnet_id2" {}
+variable "private_subnet_id1" {}
+variable "private_subnet_id2" {}
+variable "private_subnet_id3" {}
+variable "private_subnet_id4" {}
 variable "key_name" {
   type = string
 }

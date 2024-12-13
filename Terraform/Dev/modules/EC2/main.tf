@@ -1,22 +1,16 @@
 #Bastion Host/App Server
 #######################################
 
-#Security Groups- AZ1
+#Security Groups
 #Bastion Group
 resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-sg"
+  name        = "${var.environment}-bastion-sg"
   description = "Security group for frontend servers"
   vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 2377
-    to_port     = 2377
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -35,10 +29,10 @@ resource "aws_security_group" "bastion_sg" {
 
 ####################################################
 
-#Dev App Server Security Groups
-#Dev-Frontend-SG
-resource "aws_security_group" "frontend_sg" {
-  name        = "Dev-frontend-private-subnet"
+#Prod App Server Security Groups
+#Prod-Frontend-SG
+resource "aws_security_group" "frontend_sg1" {
+  name        = "${var.environment}-frontend-private-subnet1"
   description = "Security group for frontend servers"
   vpc_id      = var.vpc_id
 
@@ -47,27 +41,6 @@ resource "aws_security_group" "frontend_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/24"]
-  }
-
-  # ingress {
-  #   from_port   = 2377
-  #   to_port     = 2377
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-
-  ingress {
-    from_port   = 7946
-    to_port     = 7946
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 4789
-    to_port     = 4789
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -90,14 +63,50 @@ resource "aws_security_group" "frontend_sg" {
   }
 
   tags = {
-    Name = "${var.environment}-frontend-private-sg"
+    Name = "${var.environment}-frontend-private-sg1"
+  }
+}
+
+resource "aws_security_group" "frontend_sg2" {
+  name        = "${var.environment}-frontend-private-subnet2"
+  description = "Security group for frontend servers"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.1.0/24"]
+  }
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.environment}-frontend-private-sg2"
   }
 }
 
 #backend-SG-AZ1
-resource "aws_security_group" "backend_sg" {
-  name        = "dev-backend-private-subnet-sg"
-  description = "Security group for frontend servers"
+resource "aws_security_group" "backend_sg1" {
+  name        = "${var.environment}-backend-private-subnet-sg1"
+  description = "Security group for backend servers"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -107,33 +116,11 @@ resource "aws_security_group" "backend_sg" {
     cidr_blocks = ["10.0.0.0/24"]
   }
 
-  # # Cluster management port
-  # ingress {
-  #   from_port   = 2377
-  #   to_port     = 2377
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-
-  ingress {
-    from_port   = 7946
-    to_port     = 7946
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 4789
-    to_port     = 4789
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.2.0/24"]
   }
 
   ingress {
@@ -151,7 +138,45 @@ resource "aws_security_group" "backend_sg" {
   }
 
   tags = {
-    Name = "${var.environment}-backend-private-sg"
+    Name = "${var.environment}-backend-private-sg1"
+  }
+}
+
+resource "aws_security_group" "backend_sg2" {
+  name        = "${var.environment}-backend-private-subnet-sg2"
+  description = "Security group for backend servers"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.1.0/24"]
+  }
+
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.3.0/24"]
+  }
+
+  ingress {
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.environment}-backend-private-sg2"
   }
 }
 
@@ -173,7 +198,7 @@ resource "tls_private_key" "generated_key" {
 resource "aws_key_pair" "ssh_key_pair" {
   key_name   = var.key_name
   public_key = tls_private_key.generated_key.public_key_openssh
-# public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
+  # public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
 }
 
 # Saving private key as local tmp file on Jenkins server.
@@ -188,77 +213,81 @@ resource "local_file" "save_private_key" {
 
 #EC2
 #Bastion Host 
-resource "aws_instance" "bastion" {
+resource "aws_instance" "bastion1" {
   ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.public_subnet_id
+  subnet_id              = var.public_subnet_id1
   vpc_security_group_ids = [aws_security_group.bastion_sg.id]
   key_name               = var.key_name
-  user_data              = templatefile("${path.root}/../user_data/swarm_mgr.sh", {
-    front_ip = "${aws_instance.backend.private_ip}",
-    back_ip = "${aws_instance.frontend.private_ip}",
-    # dev_key = var.dev_key,
-    key_name = "${var.key_name}"
-    ssh_private_key = "${tls_private_key.generated_key.private_key_pem}"
-    DOCKER_CREDS_USR = var.docker_usr,
-    DOCKER_CREDS_PSW = var.docker_psw,
-    XAI_KEY = var.xai_key
-  })
-  depends_on = [
-    aws_key_pair.ssh_key_pair,
-    aws_instance.frontend,
-    aws_instance.backend
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  # user_data              = 
 
   tags = {
-    Name = "${var.environment}-bastion"
+    Name = "${var.environment}-bastion1"
+  }
+}
+
+resource "aws_instance" "bastion2" {
+  ami                    = var.ec2_ami
+  instance_type          = var.instance_type
+  subnet_id              = var.public_subnet_id2
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  key_name               = var.key_name
+  # user_data              = 
+
+  tags = {
+    Name = "${var.environment}-bastion2"
   }
 }
 
 #Frontend Private Subnet
-resource "aws_instance" "frontend" {
+resource "aws_instance" "frontend1" {
   ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.private_subnet_id
-  vpc_security_group_ids = [aws_security_group.frontend_sg.id]
+  subnet_id              = var.private_subnet_id1
+  vpc_security_group_ids = [aws_security_group.frontend_sg1.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh")
-  
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [
-    aws_key_pair.ssh_key_pair
-  ]
+  # user_data              = 
 
   tags = {
-    Name = "${var.environment}-frontend"
+    Name = "${var.environment}-frontend1"
   }
-
 }
-resource "aws_instance" "backend" {
+
+resource "aws_instance" "frontend2" {
   ami                    = var.ec2_ami
   instance_type          = var.instance_type
-  subnet_id              = var.private_subnet_id
-  vpc_security_group_ids = [aws_security_group.backend_sg.id]
+  subnet_id              = var.private_subnet_id2
+  vpc_security_group_ids = [aws_security_group.frontend_sg2.id]
   key_name               = var.key_name
-  user_data              = file("${path.root}/../user_data/swarm_node.sh")
-  
-  lifecycle {
-    create_before_destroy = true
-  }
-  
-  depends_on = [
-    aws_key_pair.ssh_key_pair
-  ]
+  # user_data              = 
 
   tags = {
-    Name = "${var.environment}-backend"
+    Name = "${var.environment}-frontend2"
   }
+}
 
+resource "aws_instance" "backend1" {
+  ami                    = var.ec2_ami
+  instance_type          = var.instance_type
+  subnet_id              = var.private_subnet_id3
+  vpc_security_group_ids = [aws_security_group.backend_sg1.id]
+  key_name               = var.key_name
+  # user_data              = 
+
+  tags = {
+    Name = "${var.environment}-backend1"
+  }
+}
+
+resource "aws_instance" "backend2" {
+  ami                    = var.ec2_ami
+  instance_type          = var.instance_type
+  subnet_id              = var.private_subnet_id4
+  vpc_security_group_ids = [aws_security_group.backend_sg2.id]
+  key_name               = var.key_name
+  # user_data              = 
+
+  tags = {
+    Name = "${var.environment}-backend2"
+  }
 }
