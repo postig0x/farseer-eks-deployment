@@ -9,7 +9,7 @@ provider "aws" {
 
 # Configure the Kubernetes provider
 provider "kubernetes" {
-  host                   = aws_eks_cluster.eks.endpoint
+  host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
 }
@@ -179,7 +179,7 @@ resource "aws_eks_node_group" "general" {
 
 resource "kubernetes_namespace" "namespace" {
   metadata {
-    name = var.environment
+    name = "${var.environment}"
   }
 }
 
