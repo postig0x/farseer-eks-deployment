@@ -14,8 +14,8 @@ kubectl config set-context --current --namespace=sb
 kubectl apply -f k8s/sb/roles
 
 
-# kubectl apply -f k8s/sb/secrets.yaml
-# kubectl apply -f k8s/sb/backend
-# kubectl apply -f k8s/sb/frontend
+kubectl apply -f k8s/sb/secrets.yaml
+kubectl apply -f k8s/sb/backend
+kubectl apply -f k8s/sb/frontend
 
 
