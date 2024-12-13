@@ -416,7 +416,7 @@ resource "aws_eks_access_entry" "developer" {
 #   # MUST be updated to match your region 
 #   set {
 #     name  = "awsRegion"
-#     value = "us-east-2"
+#     value = "us-east-1"
 #   }
 
 #   depends_on = [helm_release.metrics_server]
