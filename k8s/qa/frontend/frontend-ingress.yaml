@@ -5,8 +5,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend
-  namespace: qa
+  namespace: qa-green
   annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "alb"
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:194722418902:certificate/bfb375ad-5af7-412a-8786-5a7272e3e5cb
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: "443"
@@ -16,7 +17,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: k8s-qa-frontend-14dcc7d597-1451987193.us-east-1.elb.amazonaws.com
+    - host: k8s-qagreen-frontend-8a2db3553b-1134927357.us-east-1.elb.amazonaws.com
       http:
         paths:
           - path: /

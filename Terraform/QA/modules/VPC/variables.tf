@@ -1,5 +1,9 @@
 variable "environment" {
-  description = "Indicates environment (Dev,QA,Prod)"
+  description = "Indicates environment (Dev,sb,Prod)"
+  type        = string
+}
+variable "stacking" {
+  description = "Indicates environment (Dev,sb,Prod)"
   type        = string
 }
 

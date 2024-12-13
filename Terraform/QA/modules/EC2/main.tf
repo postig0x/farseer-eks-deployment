@@ -40,7 +40,7 @@ resource "aws_security_group" "frontend_sg1" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.1.0.0/24"]
+    cidr_blocks = ["10.0.0.0/24"]
   }
 
   ingress {
@@ -76,7 +76,7 @@ resource "aws_security_group" "frontend_sg2" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.1.1.0/24"]
+    cidr_blocks = ["10.0.1.0/24"]
   }
 
   ingress {
@@ -113,14 +113,14 @@ resource "aws_security_group" "backend_sg1" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.1.0.0/24"]
+    cidr_blocks = ["10.0.0.0/24"]
   }
 
   ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "tcp"
-    cidr_blocks = ["10.1.2.0/24"]
+    cidr_blocks = ["10.0.2.0/24"]
   }
 
   ingress {
@@ -151,14 +151,14 @@ resource "aws_security_group" "backend_sg2" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.1.1.0/24"]
+    cidr_blocks = ["10.0.1.0/24"]
   }
 
   ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "tcp"
-    cidr_blocks = ["10.1.3.0/24"]
+    cidr_blocks = ["10.0.3.0/24"]
   }
 
   ingress {
@@ -198,7 +198,7 @@ resource "tls_private_key" "generated_key" {
 resource "aws_key_pair" "ssh_key_pair" {
   key_name   = var.key_name
   public_key = tls_private_key.generated_key.public_key_openssh
-# public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
+  # public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
 }
 
 # Saving private key as local tmp file on Jenkins server.

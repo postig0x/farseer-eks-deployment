@@ -2,13 +2,13 @@
 
 # Create Security Group for the Load Balancer
 resource "aws_security_group" "alb_sg" {
-  name        = "qa_alb_sg"
-  vpc_id     = var.vpc_id
+  name   = "${var.environment}_alb_sg"
+  vpc_id = var.vpc_id
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks  = ["0.0.0.0/0"]  # Allow HTTP traffic from anywhere
+    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP traffic from anywhere
   }
 
   # Egress (outbound) rule to allow all traffic
@@ -16,13 +16,13 @@ resource "aws_security_group" "alb_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
+    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
   }
 }
 
 #Application Load Balancer 
 resource "aws_lb" "load_balancer" {
-  name               = "qa-load-balancer"
+  name               = "${var.environment}-load-balancer"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -31,14 +31,14 @@ resource "aws_lb" "load_balancer" {
   enable_deletion_protection = false
 
   tags = {
-    Environment = "qa"
+    Environment = "${var.environment}-ALB"
   }
 }
 
 
 #ALB Target Group 
 resource "aws_lb_target_group" "app_tg" {
-  name     = "app-tg"
+  name     = "${var.environment}-app-tg"
   port     = 3000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "app_tg" {
   }
 
   tags = {
-    Name = "qa-alb-target-group"
+    Name = "${var.environment}-alb-target-group"
   }
 }
 
