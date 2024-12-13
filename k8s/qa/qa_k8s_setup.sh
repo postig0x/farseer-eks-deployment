@@ -8,7 +8,7 @@ echo $SUBNET_IDS
 aws eks update-kubeconfig --region us-east-1 --name qa-eks-cluster
 kubectl config set-context --current --namespace=qa
 
-kubectl apply -f k8s/sb/roles
+kubectl apply -f k8s/qa/roles
 
 kubectl apply -f k8s/qa/secrets.yaml
 kubectl apply -f k8s/qa/backend

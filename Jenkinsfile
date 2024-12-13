@@ -80,14 +80,15 @@ pipeline {
         steps {
             script {
                 if (env.BRANCH_NAME == 'production') {
-                    echo "Deploying to Production Environment"
-                    dir('Terraform/Production') { // Navigate to the production environment directory
+                    echo "Deploying to Prod Environment"
+                    dir('Terraform/Production') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
                           terraform apply -auto-approve
                         '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
                     echo "Navigating back to the root directory"
                     dir('.') {
@@ -100,14 +101,15 @@ pipeline {
                       '''
                     }
                 } else if (env.BRANCH_NAME == 'qa') {
-                    echo "Deploying to Testing Environment"
-                    dir('Terraform/QA') { // Navigate to the qa environment directory
+                    echo "Deploying to QA Environment"
+                    dir('Terraform/QA') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
                           terraform init
                           terraform apply -auto-approve
                         '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
                     echo "Navigating back to the root directory"
                     dir('.') {
@@ -120,14 +122,15 @@ pipeline {
                       '''
                     }
                 } else if (env.BRANCH_NAME == 'develop') {
-                    echo "Deploying to Staging Environment"
+                    echo "Deploying to Dev Test Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"
                           pwd
-                          terraform init 
-                          terraform apply -auto-approve    
+                          terraform init
+                          terraform apply -auto-approve
                         '''
+                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
                     echo "Navigating back to the root directory"
                     dir('.') {
@@ -140,7 +143,7 @@ pipeline {
                       '''
                     }
                 } else if (env.BRANCH_NAME.startsWith('sb')) {
-                    echo "Deploying to Staging Environment"
+                    echo "Deploying to SB Test Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
                         sh '''
                           echo "Current working directory:"

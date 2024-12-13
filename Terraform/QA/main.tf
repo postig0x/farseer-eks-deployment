@@ -53,7 +53,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster"
+  name = "${var.environment}-test-eks-cluster-role"
 
   assume_role_policy = <<POLICY
 {
@@ -76,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test"
+  name     = "${var.environment}-eks-cluster"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -138,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodes"
+  node_group_name = "${var.environment}-eks-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -188,7 +188,7 @@ resource "aws_iam_user" "developer" {
 }
 
 resource "aws_iam_policy" "developer_eks" {
-  name = "AmazonEKSDeveloperPolicy"
+  name = "${var.environment}-AmazonEKSDeveloperPolicy"
 
   policy = <<POLICY
 {
@@ -242,7 +242,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "eks_admin" {
-  name = "AmazonEKSAdminPolicy"
+  name = "${var.environment}-AmazonEKSAdminPolicy"
 
   policy = <<POLICY
 {
@@ -280,7 +280,7 @@ resource "aws_iam_user" "manager" {
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
-  name = "AmazonEKSAssumeAdminPolicy"
+  name = "${var.environment}-AmazonEKSAssumeAdminPolicy"
 
   policy = <<POLICY
 {
@@ -475,7 +475,7 @@ resource "aws_iam_role" "aws_lbc" {
 
 resource "aws_iam_policy" "aws_lbc" {
   policy = file("./iam/AWSLoadBalancerController.json")
-  name   = "AWSLoadBalancerController"
+  name   = "${var.environment}-AWSLoadBalancerController"
 }
 
 resource "aws_iam_role_policy_attachment" "aws_lbc" {

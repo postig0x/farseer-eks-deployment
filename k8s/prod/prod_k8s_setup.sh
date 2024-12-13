@@ -8,7 +8,7 @@ echo $SUBNET_IDS
 aws eks update-kubeconfig --region us-east-1 --name prod-eks-cluster
 kubectl config set-context --current --namespace=prod
 
-kubectl apply -f k8s/sb/roles
+kubectl apply -f k8s/prod/roles
 
 kubectl apply -f k8s/prod/secrets.yaml
 kubectl apply -f k8s/prod/backend
