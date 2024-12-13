@@ -125,9 +125,8 @@ pipeline {
                         sh '''
                           echo "Current working directory:"
                           pwd
-                          terraform init
-                          terraform apply -auto-approve \                                                 
-                            -var XAI_KEY="${XAI_KEY}"      
+                          terraform init 
+                          terraform apply -auto-approve    
                         '''
                     }
                     echo "Navigating back to the root directory"
@@ -147,8 +146,7 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
-                            -var XAI_KEY="${XAI_KEY}"
+                          terraform apply -auto-approve
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
                     }
