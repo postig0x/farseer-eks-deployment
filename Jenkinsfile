@@ -71,7 +71,8 @@ pipeline {
     //         }
     //     }
     // }
-    
+                              // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
+                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
 
     stage('Deploy') {
         agent { label 'build-node' }
@@ -87,8 +88,16 @@ pipeline {
                           terraform init
                           terraform apply -auto-approve
                         '''
-                          // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
+                    }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/prod/prod_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/prod/prod_k8s_setup.sh $XAI_KEY
+                      '''
                     }
                 } else if (env.BRANCH_NAME == 'qa') {
                     echo "Deploying to Testing Environment"
@@ -100,6 +109,16 @@ pipeline {
                           terraform apply -auto-approve
                         '''
                     }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/qa/qa_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
+                      '''
+                    }
                 } else if (env.BRANCH_NAME == 'develop') {
                     echo "Deploying to Staging Environment"
                     dir('Terraform/Dev') { // Navigate to the staging environment directory
@@ -107,12 +126,19 @@ pipeline {
                           echo "Current working directory:"
                           pwd
                           terraform init
-                          terraform apply -auto-approve \
-                            -var dev_key="${DEV_KEY}" \
-                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
-                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
+                          terraform apply -auto-approve \                                                 
                             -var XAI_KEY="${XAI_KEY}"      
                         '''
+                    }
+                    echo "Navigating back to the root directory"
+                    dir('.') {
+                      sh '''
+                        # Ensure script is executable
+                        chmod +x k8s/dev/dev_k8s_setup.sh
+
+                        # Execute the script, passing the XAI_KEY ENV Variable
+                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
+                      '''
                     }
                 } else if (env.BRANCH_NAME.startsWith('sb')) {
                     echo "Deploying to Staging Environment"
@@ -122,12 +148,10 @@ pipeline {
                           pwd
                           terraform init
                           terraform apply -auto-approve \
-                            -var DOCKER_CREDS_USR="${DOCKER_CREDS_USR}" \
-                            -var DOCKER_CREDS_PSW="${DOCKER_CREDS_PSW}" \
                             -var XAI_KEY="${XAI_KEY}"
                         '''
                     // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                  }
+                    }
                     echo "Navigating back to the root directory"
                     dir('.') {
                       sh '''
