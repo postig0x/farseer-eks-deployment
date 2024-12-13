@@ -181,8 +181,6 @@ resource "kubernetes_namespace" "namespace" {
   metadata {
     name = var.environment
   }
-
-  depends_on = [kubernetes]
 }
 
 resource "aws_iam_user" "developer" {
