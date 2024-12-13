@@ -2,7 +2,7 @@
 
 XAI_KEY="$1"
 
-SUBNET_IDS=$(cd Terraform/sb && terraform output  -json private_ips | jq -r 'join(",")')
+SUBNET_IDS=$(cd Terraform/dev && terraform output  -json private_ips | jq -r 'join(",")')
 
 echo $SUBNET_IDS
 aws eks update-kubeconfig --region us-east-1 --name dev-test-eks-cluster
