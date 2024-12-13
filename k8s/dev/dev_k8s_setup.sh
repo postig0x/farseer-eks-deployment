@@ -6,7 +6,6 @@ SUBNET_IDS=$(cd Terraform/Dev && terraform output  -json private_ips | jq -r 'jo
 
 echo $SUBNET_IDS
 aws eks update-kubeconfig --region us-east-1 --name dev-test-eks-cluster
-kubectl create namespace dev || echo "Namespace dev already exists"
 kubectl config set-context --current --namespace=dev
 
 kubectl apply -f k8s/sb/roles
