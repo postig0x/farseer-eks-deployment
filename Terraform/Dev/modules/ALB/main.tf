@@ -2,13 +2,13 @@
 
 # Create Security Group for the Load Balancer
 resource "aws_security_group" "alb_sg" {
-  name        = "${var.environment}_alb_sg"
-  vpc_id     = var.vpc_id
+  name   = "${var.environment}_alb_sg"
+  vpc_id = var.vpc_id
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks  = ["0.0.0.0/0"]  # Allow HTTP traffic from anywhere
+    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP traffic from anywhere
   }
 
   # Egress (outbound) rule to allow all traffic
@@ -16,7 +16,7 @@ resource "aws_security_group" "alb_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
+    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
   }
 }
 

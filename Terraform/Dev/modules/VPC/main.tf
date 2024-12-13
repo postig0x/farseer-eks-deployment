@@ -3,10 +3,10 @@
 ##################################################
 
 resource "aws_vpc" "vpc" {
-  cidr_block = var.cidr_block
-  instance_tenancy = "default"
+  cidr_block           = var.cidr_block
+  instance_tenancy     = "default"
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
   tags = {
     Name = "${var.environment}_VPC"
   }
@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "igw" {
 #Elastic IP
 resource "aws_eip" "nat_eip1" {
 
-  domain= "vpc"
+  domain = "vpc"
 
   tags = {
     Name = "${var.environment}-nat-eip1"
@@ -36,7 +36,7 @@ resource "aws_eip" "nat_eip1" {
 
 resource "aws_eip" "nat_eip2" {
 
-    domain= "vpc"
+  domain = "vpc"
 
   tags = {
     Name = "${var.environment}-nat-eip2"
@@ -48,7 +48,7 @@ resource "aws_nat_gateway" "nat_gw1" {
   allocation_id = aws_eip.nat_eip1.id
   subnet_id     = aws_subnet.public-subnet1.id
 
-  depends_on = [ aws_internet_gateway.igw ]
+  depends_on = [aws_internet_gateway.igw]
 
   tags = {
     Name = "${var.environment}-natgw1"
@@ -59,7 +59,7 @@ resource "aws_nat_gateway" "nat_gw2" {
   allocation_id = aws_eip.nat_eip2.id
   subnet_id     = aws_subnet.public-subnet2.id
 
-  depends_on = [ aws_internet_gateway.igw ]
+  depends_on = [aws_internet_gateway.igw]
 
   tags = {
     Name = "${var.environment}-natgw2"
@@ -74,28 +74,28 @@ resource "aws_nat_gateway" "nat_gw2" {
 #############################################################################
 
 resource "aws_subnet" "public-subnet1" {
-  vpc_id = aws_vpc.vpc.id
-  cidr_block = "10.0.0.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.0.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name                                                   = "${var.environment}-public-subnet1"
-    "kubernetes.io/role/elb"                               = "1"
-    "kubernetes.io/cluster/dev-test"                        = "owned"
+    Name                             = "${var.environment}-public-subnet1"
+    "kubernetes.io/role/elb"         = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
 resource "aws_subnet" "public-subnet2" {
-  vpc_id = aws_vpc.vpc.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1b"
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
 
   tags = {
-    Name                                                   = "${var.environment}-public-subnet2"
-    "kubernetes.io/role/elb"                               = "1"
-    "kubernetes.io/cluster/dev-test"                        = "owned"
+    Name                             = "${var.environment}-public-subnet2"
+    "kubernetes.io/role/elb"         = "1"
+    "kubernetes.io/cluster/dev-test" = "owned"
   }
 }
 
@@ -138,9 +138,9 @@ resource "aws_subnet" "private-subnet1" {
   cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1a"
   tags = {
-    Name = "${var.environment}-private-subnet1"
+    Name                              = "${var.environment}-private-subnet1"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-test"  = "owned"
   }
 }
 
@@ -149,9 +149,9 @@ resource "aws_subnet" "private-subnet2" {
   cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1b"
   tags = {
-    Name = "${var.environment}-private-subnet2"
+    Name                              = "${var.environment}-private-subnet2"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-test"  = "owned"
   }
 }
 
@@ -160,9 +160,9 @@ resource "aws_subnet" "private-subnet3" {
   cidr_block        = "10.0.4.0/24"
   availability_zone = "us-east-1a"
   tags = {
-    Name = "${var.environment}-private-subnet3"
+    Name                              = "${var.environment}-private-subnet3"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-test"  = "owned"
   }
 }
 
@@ -171,9 +171,9 @@ resource "aws_subnet" "private-subnet4" {
   cidr_block        = "10.0.5.0/24"
   availability_zone = "us-east-1b"
   tags = {
-    Name = "${var.environment}-private-subnet4"
+    Name                              = "${var.environment}-private-subnet4"
     "kubernetes.io/role/internal-elb" = "1"
-    "kubernetes.io/cluster/dev-test" = "owned"
+    "kubernetes.io/cluster/dev-test"  = "owned"
   }
 }
 #Private Route Tables
@@ -236,9 +236,9 @@ resource "aws_route_table_association" "private-rt-association4" {
 ### VPC PEERING ###
 ##################################################
 resource "aws_vpc_peering_connection" "peering" {
-  peer_vpc_id   = aws_vpc.vpc.id
-  vpc_id        = data.aws_vpc.default.id
-  auto_accept   = true
+  peer_vpc_id = aws_vpc.vpc.id
+  vpc_id      = data.aws_vpc.default.id
+  auto_accept = true
   tags = {
     Name = "${var.environment}_vpc_peering"
   }
@@ -260,6 +260,6 @@ data "aws_route_table" "default" {
 # Add a route for VPC peering to the default route table
 resource "aws_route" "vpc_peering_route" {
   route_table_id            = data.aws_route_table.default.id
-  destination_cidr_block    = aws_vpc.vpc.cidr_block  # Adjust based on peer VPC
-  vpc_peering_connection_id  = aws_vpc_peering_connection.peering.id
+  destination_cidr_block    = aws_vpc.vpc.cidr_block # Adjust based on peer VPC
+  vpc_peering_connection_id = aws_vpc_peering_connection.peering.id
 }

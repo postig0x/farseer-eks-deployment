@@ -198,7 +198,7 @@ resource "tls_private_key" "generated_key" {
 resource "aws_key_pair" "ssh_key_pair" {
   key_name   = var.key_name
   public_key = tls_private_key.generated_key.public_key_openssh
-# public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
+  # public_key = local.public_key  # Path to your public key file //LEAVING THIS IN CASE
 }
 
 # Saving private key as local tmp file on Jenkins server.
