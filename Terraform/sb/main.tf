@@ -53,7 +53,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "${var.environment}-test-eks-cluster"
+  name = "sb-test-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -76,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test"
+  name     = "sb-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -101,7 +101,7 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name = "${var.environment}-test-eks-nodes-role"
+  name = "sb-test-eks-nodes"
 
   assume_role_policy = <<POLICY
 {
@@ -138,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_read_on
 resource "aws_eks_node_group" "general" {
   cluster_name    = aws_eks_cluster.eks.name
   version         = 1.29
-  node_group_name = "${var.environment}-general-nodes"
+  node_group_name = "general"
   node_role_arn   = aws_iam_role.nodes.arn
 
   subnet_ids = [
@@ -162,7 +162,7 @@ resource "aws_eks_node_group" "general" {
   }
 
   labels = {
-    role = "${var.environment}-eks-nodes"
+    role = "general"
   }
 
   depends_on = [
@@ -179,12 +179,12 @@ resource "aws_eks_node_group" "general" {
 
 resource "kubernetes_namespace" "namespace" {
   metadata {
-    name = "${var.environment}"
+    name = "sb"
   }
 }
 
 resource "aws_iam_user" "developer" {
-  name = "${var.environment}-developer"
+  name = "developer"
 }
 
 resource "aws_iam_policy" "developer_eks" {
@@ -223,7 +223,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "${var.environment}-test-eks-admin-role"
+  name = "sb-test-eks-admin"
 
   assume_role_policy = <<POLICY
 {
@@ -276,7 +276,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "manager" {
-  name = "${var.environment}-manager"
+  name = "manager"
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
@@ -334,7 +334,7 @@ resource "helm_release" "metrics_server" {
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
-  namespace  = "${var.environment}"
+  namespace  = "sb"
   version    = "3.12.1"
 
   values = [file("${path.module}/values/metrics-server.yaml")]
@@ -354,7 +354,7 @@ resource "aws_eks_addon" "pod_identity" {
 }
 
 resource "aws_iam_role" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-role"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -374,7 +374,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
-  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler-policy"
+  name = "${aws_eks_cluster.eks.name}-cluster-autoscaler"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -414,17 +414,17 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = "sb"
   service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  name = "${var.environment}-autoscaler"
+  name = "autoscaler"
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  namespace  = "${var.environment}"
+  namespace  = "sb"
   version    = "9.37.0"
 
   set {
@@ -469,7 +469,7 @@ data "aws_iam_policy_document" "aws_lbc" {
 }
 
 resource "aws_iam_role" "aws_lbc" {
-  name               = "${aws_eks_cluster.eks.name}-aws-lbc-role"
+  name               = "${aws_eks_cluster.eks.name}-aws-lbc"
   assume_role_policy = data.aws_iam_policy_document.aws_lbc.json
 }
 
@@ -485,17 +485,17 @@ resource "aws_iam_role_policy_attachment" "aws_lbc" {
 
 resource "aws_eks_pod_identity_association" "aws_lbc" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "${var.environment}"
+  namespace       = "sb"
   service_account = "aws-load-balancer-controller"
   role_arn        = aws_iam_role.aws_lbc.arn
 }
 
 resource "helm_release" "aws_lbc" {
-  name = "${var.environment}-aws-load-balancer-controller"
+  name = "aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "${var.environment}"
+  namespace  = "sb"
   version    = "1.7.2"
 
   set {
