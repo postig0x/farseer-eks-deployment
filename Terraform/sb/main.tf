@@ -53,7 +53,7 @@ output "private_ips" {
 }
 
 resource "aws_iam_role" "eks" {
-  name = "sb-test-eks-cluster"
+  name = "${var.environment}-test-eks-cluster"
 
   assume_role_policy = <<POLICY
 {
@@ -76,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "sb-test"
+  name     = "${var.environment}-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
@@ -101,7 +101,7 @@ resource "aws_eks_cluster" "eks" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name = "sb-test-eks-nodes"
+  name = "${var.environment}-test-eks-nodes"
 
   assume_role_policy = <<POLICY
 {
@@ -152,8 +152,8 @@ resource "aws_eks_node_group" "general" {
   instance_types = ["t3.medium"]
 
   scaling_config {
-    desired_size = 1
-    max_size     = 10
+    desired_size = 2
+    max_size     = 5
     min_size     = 0
   }
 
@@ -174,6 +174,12 @@ resource "aws_eks_node_group" "general" {
   # Allow external changes without Terraform plan difference
   lifecycle {
     ignore_changes = [scaling_config[0].desired_size]
+  }
+}
+
+resource "kubernetes_namespace" "namespace" {
+  metadata {
+    name = "${var.environment}"
   }
 }
 
@@ -217,7 +223,7 @@ resource "aws_eks_access_entry" "developer" {
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "eks_admin" {
-  name = "sb-test-eks-admin"
+  name = "${var.environment}-test-eks-admin"
 
   assume_role_policy = <<POLICY
 {
@@ -328,12 +334,15 @@ resource "helm_release" "metrics_server" {
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
-  namespace  = "kube-system"
+  namespace  = "${var.environment}"
   version    = "3.12.1"
 
   values = [file("${path.module}/values/metrics-server.yaml")]
 
-  depends_on = [aws_eks_node_group.general]
+  depends_on = [
+    aws_eks_node_group.general,
+    kubernetes_namespace.namespace
+  ]
 }
 
 
@@ -405,7 +414,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
 
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "kube-system"
+  namespace       = "${var.environment}"
   service_account = "cluster-autoscaler"
   role_arn        = aws_iam_role.cluster_autoscaler.arn
 }
@@ -415,7 +424,7 @@ resource "helm_release" "cluster_autoscaler" {
 
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  namespace  = "kube-system"
+  namespace  = "${var.environment}"
   version    = "9.37.0"
 
   set {
@@ -434,8 +443,12 @@ resource "helm_release" "cluster_autoscaler" {
     value = "us-east-1"
   }
 
-  depends_on = [helm_release.metrics_server]
+  depends_on = [
+    helm_release.metrics_server,
+    kubernetes_namespace.namespace
+    ]
 }
+
 
 #-------------------LOADBALANCER------------------
 
@@ -468,22 +481,13 @@ resource "aws_iam_policy" "aws_lbc" {
 resource "aws_iam_role_policy_attachment" "aws_lbc" {
   policy_arn = aws_iam_policy.aws_lbc.arn
   role       = aws_iam_role.aws_lbc.name
-
-  depends_on = [
-    aws_iam_role.aws_lbc,
-    aws_iam_policy.aws_lbc
-  ]
 }
 
 resource "aws_eks_pod_identity_association" "aws_lbc" {
   cluster_name    = aws_eks_cluster.eks.name
-  namespace       = "kube-system"
+  namespace       = "${var.environment}"
   service_account = "aws-load-balancer-controller"
   role_arn        = aws_iam_role.aws_lbc.arn
-
-  depends_on = [
-    aws_iam_role_policy_attachment.aws_lbc
-  ]
 }
 
 resource "helm_release" "aws_lbc" {
@@ -491,7 +495,7 @@ resource "helm_release" "aws_lbc" {
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
+  namespace  = "${var.environment}"
   version    = "1.7.2"
 
   set {
@@ -506,5 +510,6 @@ resource "helm_release" "aws_lbc" {
 
   depends_on = [
     helm_release.cluster_autoscaler,
-    aws_eks_pod_identity_association.aws_lbc]
+    kubernetes_namespace.namespace
+  ]
 }
