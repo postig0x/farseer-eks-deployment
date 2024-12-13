@@ -76,7 +76,7 @@ resource "aws_iam_role_policy_attachment" "eks" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  name     = "${var.environment}-test-eks-cluster"
+  name     = "${var.environment}-test"
   version  = 1.29
   role_arn = aws_iam_role.eks.arn
 
