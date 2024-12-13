@@ -188,7 +188,7 @@ resource "aws_iam_user" "developer" {
 }
 
 resource "aws_iam_policy" "developer_eks" {
-  name = "AmazonEKSDeveloperPolicy"
+  name = "${var.environment}-AmazonEKSDeveloperPolicy"
 
   policy = <<POLICY
 {
@@ -242,7 +242,7 @@ POLICY
 }
 
 resource "aws_iam_policy" "eks_admin" {
-  name = "AmazonEKSAdminPolicy"
+  name = "${var.environment}-AmazonEKSAdminPolicy"
 
   policy = <<POLICY
 {
@@ -280,7 +280,7 @@ resource "aws_iam_user" "manager" {
 }
 
 resource "aws_iam_policy" "eks_assume_admin" {
-  name = "AmazonEKSAssumeAdminPolicy"
+  name = "${var.environment}-AmazonEKSAssumeAdminPolicy"
 
   policy = <<POLICY
 {
@@ -475,7 +475,7 @@ resource "aws_iam_role" "aws_lbc" {
 
 resource "aws_iam_policy" "aws_lbc" {
   policy = file("./iam/AWSLoadBalancerController.json")
-  name   = "AWSLoadBalancerController"
+  name   = "${var.environment}-AWSLoadBalancerController"
 }
 
 resource "aws_iam_role_policy_attachment" "aws_lbc" {
