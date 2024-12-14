@@ -119,9 +119,9 @@ stage('Deploy') {
             echo "Checking for script at path: ${script_path}"
 
             // Ensure the script exists and is executable
-            if (!fileExists(script_path)) {
-                error("Script not found at: ${script_path}")
-            }
+            // if (!fileExists(script_path)) {
+            //     error("Script not found at: ${script_path}")
+            // }
             sh """
                 chmod +x ${script_path}
                 ${script_path} ${XAI_KEY}
