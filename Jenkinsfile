@@ -129,7 +129,7 @@ stage('Deploy') {
 
   
 
-    Add a Cleanup Stage Here
+    // Add a Cleanup Stage Here
     stage('logout') {
       agent { label 'build-node' } // Specify your preferred agent here
       steps {
