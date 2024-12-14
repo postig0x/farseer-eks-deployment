@@ -74,35 +74,36 @@ pipeline {
                               // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
                           //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
 
-    stage('Deploy') {
-        agent { label 'build-node' }
-        
-        steps {
-            script {
-            def stacking_folder
+stage('Deploy') {
+    agent { label 'build-node' }
+    steps {
+        script {
+            def stacking_folder = ""
             def env_folder = ""    
-                if (env.BRANCH_NAME.endsWith('_green')) {
-                    stacking_folder = 'green'
-                } else if (env.BRANCH_NAME.endsWith('_blue')) {
-                    stacking_folder = 'blue'
-                } else {
-                    echo "No matching branch suffix. Skipping deployment."
-                    error("Unknown branch: ${env.BRANCH_NAME}")
-                }  
 
-                // Check for develop prefix and set subfolder
-                if (env.BRANCH_NAME.startsWith('sb')) {
-                    env_folder = "sb" 
-                } else if (env.BRANCH_NAME.startsWith('develop')) {
-                    env_folder = "Dev"       
-                } else if (env.BRANCH_NAME.startsWith('qa')) {
-                    env_folder = "QA"
-                } else if (env.BRANCH_NAME.startsWith('prod')) {
-                    env_folder = "Production"
-                } else {
-                    echo "No deployment for branch: ${env.BRANCH_NAME}"
-                    error("Unknown branch: ${env.BRANCH_NAME}")
-                }     
+            // Determine the stacking folder (green/blue)
+            if (env.BRANCH_NAME.endsWith('_green')) {
+                stacking_folder = 'green'
+            } else if (env.BRANCH_NAME.endsWith('_blue')) {
+                stacking_folder = 'blue'
+            } else {
+                echo "No matching branch suffix. Skipping deployment."
+                error("Unknown branch suffix in: ${env.BRANCH_NAME}")
+            }  
+
+            // Determine the environment folder (Dev, QA, etc.)
+            if (env.BRANCH_NAME.startsWith('feature/')) {
+                env_folder = "sb" 
+            } else if (env.BRANCH_NAME.startsWith('develop')) {
+                env_folder = "Dev"       
+            } else if (env.BRANCH_NAME.startsWith('qa')) {
+                env_folder = "QA"
+            } else if (env.BRANCH_NAME.startsWith('prod')) {
+                env_folder = "Production"
+            } else {
+                echo "No deployment for branch: ${env.BRANCH_NAME}"
+                error("Unknown branch prefix in: ${env.BRANCH_NAME}")
+            }     
 
             echo "Deploying to ${stacking_folder}/${env_folder} environment"
 
@@ -113,24 +114,31 @@ pipeline {
                     pwd
                     terraform init
                     terraform apply -auto-approve
-                  '''
-              // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-              }
-              echo "Navigating back to the root directory"
-              dir('.') {
+                '''
+            }
+
+            echo "Navigating back to the root directory"
+            dir('.') {
+                // Validate the script path and execute
+                def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
+                echo "Checking script at path: ${script_path}"
                 sh '''
+                  if [ ! -f ${script_path} ]; then
+                    echo "Error: Script ${script_path} not found."
+                    exit 1
+                  fi
+
                   # Ensure script is executable
-                  chmod +x k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh
+                  chmod +x ${script_path}
 
                   # Execute the script, passing the XAI_KEY ENV Variable
-                  ./k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh $XAI_KEY
+                  ${script_path} $XAI_KEY
                 '''
-              }             
-
             }
         }
     }
-    
+}
+
   
 
     // Add a Cleanup Stage Here
