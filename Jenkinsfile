@@ -79,95 +79,54 @@ pipeline {
         
         steps {
             script {
-                if (env.BRANCH_NAME == 'production') {
-                    echo "Deploying to Prod Environment"
-                    dir('Terraform/Production') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve
-                        '''
-                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
-                    echo "Navigating back to the root directory"
-                    dir('.') {
-                      sh '''
-                        # Ensure script is executable
-                        chmod +x k8s/prod/prod_k8s_setup.sh
+            def stacking_folder
+            def env_folder = ""    
+                if (env.BRANCH_NAME.endsWith('_green')) {
+                    stacking_folder = 'green'
+                } else if (env.BRANCH_NAME.endsWith('_blue')) {
+                    stacking_folder = 'blue'
+                } else {
+                    echo "No matching branch suffix. Skipping deployment."
+                    error("Unknown branch: ${env.BRANCH_NAME}")
+                }  
 
-                        # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/prod/prod_k8s_setup.sh $XAI_KEY
-                      '''
-                    }
+                // Check for develop prefix and set subfolder
+                if (env.BRANCH_NAME.startsWith('sb')) {
+                    env_folder = "sb" 
+                } else if (env.BRANCH_NAME.startsWith('develop')) {
+                    env_folder = "Dev"       
                 } else if (env.BRANCH_NAME.startsWith('qa')) {
-                    echo "Deploying to QA Environment"
-                    dir('Terraform/QA') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve
-                        '''
-                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
-                    echo "Navigating back to the root directory"
-                    dir('.') {
-                      sh '''
-                        # Ensure script is executable
-                        chmod +x k8s/qa/qa_k8s_setup.sh
-
-                        # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/qa/qa_k8s_setup.sh $XAI_KEY
-                      '''
-                    }
-                } else if (env.BRANCH_NAME.startsWith('dev')) {
-                    echo "Deploying to Dev Test Environment"
-                    dir('Terraform/Dev') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve
-                        '''
-                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
-                    echo "Navigating back to the root directory"
-                    dir('.') {
-                      sh '''
-                        # Ensure script is executable
-                        chmod +x k8s/dev/dev_k8s_setup.sh
-
-                        # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
-                      '''
-                    }
-
-                } else if (env.BRANCH_NAME.startsWith('sb')) {
-                    echo "Deploying to SB Test Environment"
-                    dir('Terraform/Dev') { // Navigate to the staging environment directory
-                        sh '''
-                          echo "Current working directory:"
-                          pwd
-                          terraform init
-                          terraform apply -auto-approve
-                        '''
-                    // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
-                    }
-                    echo "Navigating back to the root directory"
-                    dir('.') {
-                      sh '''
-                        # Ensure script is executable
-                        chmod +x k8s/dev/dev_k8s_setup.sh
-
-                        # Execute the script, passing the XAI_KEY ENV Variable
-                        ./k8s/dev/dev_k8s_setup.sh $XAI_KEY
-                      '''
-                    }
+                    env_folder = "QA"
+                } else if (env.BRANCH_NAME.startsWith('prod')) {
+                    env_folder = "Production"
                 } else {
                     echo "No deployment for branch: ${env.BRANCH_NAME}"
                     error("Unknown branch: ${env.BRANCH_NAME}")
-                }
+                }     
+
+            echo "Deploying to ${stacking_folder}/${env_folder} environment"
+
+            // Navigate to the appropriate Terraform folder
+            dir("Terraform/${stacking_folder}/${env_folder}") {
+                sh '''
+                    echo "Current working directory:"
+                    pwd
+                    terraform init
+                    terraform apply -auto-approve
+                  '''
+              // echo "Skipping deployment for feature branch: ${env.BRANCH_NAME}"
+              }
+              echo "Navigating back to the root directory"
+              dir('.') {
+                sh '''
+                  # Ensure script is executable
+                  chmod +x k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh
+
+                  # Execute the script, passing the XAI_KEY ENV Variable
+                  ./k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh $XAI_KEY
+                '''
+              }             
+
             }
         }
     }
