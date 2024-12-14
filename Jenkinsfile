@@ -79,7 +79,7 @@ stage('Deploy') {
     steps {
         script {
             def stacking_folder = ""
-            def env_folder = ""    
+            def env_folder = ""
 
             // Determine the stacking folder (green/blue)
             if (env.BRANCH_NAME.endsWith('_green')) {
@@ -87,57 +87,49 @@ stage('Deploy') {
             } else if (env.BRANCH_NAME.endsWith('_blue')) {
                 stacking_folder = 'blue'
             } else {
-                echo "No matching branch suffix. Skipping deployment."
                 error("Unknown branch suffix in: ${env.BRANCH_NAME}")
-            }  
+            }
 
             // Determine the environment folder (Dev, QA, etc.)
             if (env.BRANCH_NAME.startsWith('feature/')) {
-                env_folder = "sb" 
+                env_folder = "sb"
             } else if (env.BRANCH_NAME.startsWith('develop')) {
-                env_folder = "Dev"       
+                env_folder = "Dev"
             } else if (env.BRANCH_NAME.startsWith('qa')) {
                 env_folder = "QA"
             } else if (env.BRANCH_NAME.startsWith('prod')) {
                 env_folder = "Production"
             } else {
-                echo "No deployment for branch: ${env.BRANCH_NAME}"
                 error("Unknown branch prefix in: ${env.BRANCH_NAME}")
-            }     
+            }
 
             echo "Deploying to ${stacking_folder}/${env_folder} environment"
 
-            // Navigate to the appropriate Terraform folder
+            // Navigate to the Terraform folder
             dir("Terraform/${stacking_folder}/${env_folder}") {
                 sh '''
-                    echo "Current working directory:"
-                    pwd
+                    echo "Initializing Terraform"
                     terraform init
                     terraform apply -auto-approve
                 '''
             }
 
-            echo "Navigating back to the root directory"
-            dir('.') {
-                // Validate the script path and execute
-                def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
-                echo "Checking script at path: ${script_path}"
-                sh '''
-                  if [ ! -f ${script_path} ]; then
-                    echo "Error: Script ${script_path} not found."
-                    exit 1
-                  fi
+            // Validate and execute the Kubernetes setup script
+            def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
+            echo "Checking for script at path: ${script_path}"
 
-                  # Ensure script is executable
-                  chmod +x ${script_path}
-
-                  # Execute the script, passing the XAI_KEY ENV Variable
-                  ${script_path} $XAI_KEY
-                '''
+            // Ensure the script exists and is executable
+            if (!fileExists(script_path)) {
+                error("Script not found at: ${script_path}")
             }
+            sh """
+                chmod +x ${script_path}
+                ${script_path} ${XAI_KEY}
+            """
         }
     }
 }
+
 
   
 
