@@ -117,13 +117,12 @@ stage('Deploy') {
             // Validate and execute the Kubernetes setup script
             def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
             echo "Checking for script at path: ${script_path}"
-
             // Ensure the script exists and is executable
             // if (!fileExists(script_path)) {
             //     error("Script not found at: ${script_path}")
             // }
             sh """
-                chmod +x ${script_path}
+                chmod +x "${script_path}"
                 ${script_path} ${XAI_KEY}
             """
         }

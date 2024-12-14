@@ -10,6 +10,7 @@ kubectl config set-context --current --namespace=dev-green
 
 kubectl apply -f k8s/dev/roles
 
+echo "applying deployments"
 kubectl apply -f k8s/dev/secrets.yaml
 kubectl apply -f k8s/dev/backend
 kubectl apply -f k8s/dev/frontend
