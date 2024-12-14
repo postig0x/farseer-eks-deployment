@@ -11,147 +11,143 @@ pipeline {
   }
 
     stages {
-        // stage('Build') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //             chmod +x ./CICD_Scripts/frontend.sh
-        //             ./CICD_Scripts/frontend.sh
-        //             chmod +x ./CICD_Scripts/backend.sh
-        //             ./CICD_Scripts/backend.sh
-        //             '''
+            stage('Build') {
+                steps {
+                    script {
+                        sh '''
+                        chmod +x ./CICD_Scripts/frontend.sh
+                        ./CICD_Scripts/frontend.sh
+                        chmod +x ./CICD_Scripts/backend.sh
+                        ./CICD_Scripts/backend.sh
+                        '''
 
-        //               }
-        //           } 
-        //       }
+                            }
+                        } 
+                    }
     
 
-        // stage ('Sec-Check: OWASP') {
-        //     environment {
-        //         NVD_APIKEY = credentials("NVD-ApiKey")
-        //     }
-        //     steps {
-        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${NVD_APIKEY}', odcInstallation: 'DP-Check'
-        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        //     }
-        // }
-
-
-
-      stage('Cleanup') {
-        agent { label 'build-node' }
-        steps {
-          sh '''
-            docker system prune -f
-            git clean -ffdx -e "*.tfstate*" -e ".terraform/*"
-          '''
-        }
-      }
-
-    // stage('Build & Push Images') {
-    //     agent { label 'build-node' }
-    //     steps {
-    //         // Log in to Docker Hub
-    //         sh 'echo ${DOCKER_CREDS_PSW} | docker login -u ${DOCKER_CREDS_USR} --password-stdin'
-            
-    //         // Inject API Key
-    //         withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
-    //             // Build and push backend
-    //             sh '''
-    //               echo "Current directory: $(pwd)"
-    //               docker build --build-arg XAI_KEY=${XAI_KEY} -t ${DOCKER_CREDS_USR}/farseer_back:latest -f ./docker/back.Dockerfile .
-    //               docker push ${DOCKER_CREDS_USR}/farseer_back:latest
-    //             '''
-                
-    //             // Build and push frontend
-    //             sh '''
-    //               docker build -t ${DOCKER_CREDS_USR}/farseer_front:latest -f ./docker/front.Dockerfile .
-    //               docker push ${DOCKER_CREDS_USR}/farseer_front:latest
-    //             '''
-    //         }
-    //     }
-    // }
-                              // -var="dockerhub_username=${DOCKER_CREDS_USR}" \
-                          //   -var="dockerhub_password=${DOCKER_CREDS_PSW}"
-
-stage('Deploy') {
-    agent { label 'build-node' }
-    steps {
-        script {
-            def stacking_folder = ""
-            def env_folder = ""
-
-            // Determine the stacking folder (green/blue)
-            if (env.BRANCH_NAME.endsWith('_green')) {
-                stacking_folder = 'green'
-            } else if (env.BRANCH_NAME.endsWith('_blue')) {
-                stacking_folder = 'blue'
-            } else {
-                error("Unknown branch suffix in: ${env.BRANCH_NAME}")
+            stage ('Sec-Check: OWASP') {
+                environment {
+                    NVD_APIKEY = credentials("NVD-ApiKey")
+                }
+                steps {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey ${NVD_APIKEY}', odcInstallation: 'DP-Check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
             }
 
-            // Determine the environment folder (Dev, QA, etc.)
-            if (env.BRANCH_NAME.startsWith('feature/')) {
-                env_folder = "sb"
-            } else if (env.BRANCH_NAME.startsWith('develop')) {
-                env_folder = "Dev"
-            } else if (env.BRANCH_NAME.startsWith('qa')) {
-                env_folder = "QA"
-            } else if (env.BRANCH_NAME.startsWith('prod')) {
-                env_folder = "Production"
-            } else {
-                error("Unknown branch prefix in: ${env.BRANCH_NAME}")
-            }
 
-            echo "Deploying to ${stacking_folder}/${env_folder} environment"
 
-            // Navigate to the Terraform folder
-            dir("Terraform/${stacking_folder}/${env_folder}") {
+            stage('Cleanup') {
+            agent { label 'build-node' }
+            steps {
                 sh '''
-                    echo "Initializing Terraform"
-                    terraform init
-                    terraform apply -auto-approve
+                docker system prune -f
+                git clean -ffdx -e "*.tfstate*" -e ".terraform/*"
                 '''
             }
+            }
 
-            // Validate and execute the Kubernetes setup script
-            def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
-            echo "Checking for script at path: ${script_path}"
+            stage('Build & Push Images') {
+                agent { label 'build-node' }
+                steps {
+                    // Log in to Docker Hub
+                    sh '''
+                    echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin
+                    '''
 
-            sh """
-                chmod +x "${script_path}"
-                ${script_path} ${XAI_KEY}
-            """
-        }
-    }
-}
+                    // Inject API Key for backend build
+                    withCredentials([string(credentialsId: 'XAI_KEY', variable: 'XAI_KEY')]) {
+                        // Build and push backend image
+                        sh '''
+                        echo "Building backend Docker image..."
+                        docker build \
+                            --build-arg XAI_KEY=$XAI_KEY \
+                            -t $DOCKER_CREDS_USR/farseer_back:latest \
+                            -f ./docker/back.Dockerfile .
+                        docker push $DOCKER_CREDS_USR/farseer_back:latest
+                        '''
+                    }
+
+                    // Build and push frontend image
+                    sh '''
+                    echo "Building frontend Docker image..."
+                    docker build \
+                        -t $DOCKER_CREDS_USR/farseer_front:latest \
+                        -f ./docker/front.Dockerfile .
+                    docker push $DOCKER_CREDS_USR/farseer_front:latest
+                    '''
+                }
+            }
 
 
-  
 
-    // Add a Cleanup Stage Here
-    stage('logout') {
-      agent { label 'build-node' } // Specify your preferred agent here
-      steps {
-        sh '''
-          docker logout
-          docker system prune -f
-        '''
-      }
-    }
+            stage('Deploy') {
+                agent { label 'build-node' }
+                steps {
+                    script {
+                        def stacking_folder = ""
+                        def env_folder = ""
+
+                        // Determine the stacking folder (green/blue)
+                        if (env.BRANCH_NAME.endsWith('_green')) {
+                            stacking_folder = 'green'
+                        } else if (env.BRANCH_NAME.endsWith('_blue')) {
+                            stacking_folder = 'blue'
+                        } else {
+                            error("Unknown branch suffix in: ${env.BRANCH_NAME}")
+                        }
+
+                        // Determine the environment folder (Dev, QA, etc.)
+                        if (env.BRANCH_NAME.startsWith('feature/')) {
+                            env_folder = "sb"
+                        } else if (env.BRANCH_NAME.startsWith('develop')) {
+                            env_folder = "Dev"
+                        } else if (env.BRANCH_NAME.startsWith('qa')) {
+                            env_folder = "QA"
+                        } else if (env.BRANCH_NAME.startsWith('prod')) {
+                            env_folder = "Production"
+                        } else {
+                            error("Unknown branch prefix in: ${env.BRANCH_NAME}")
+                        }
+
+                        echo "Deploying to ${stacking_folder}/${env_folder} environment"
+
+                        // Navigate to the Terraform folder
+                        dir("Terraform/${stacking_folder}/${env_folder}") {
+                            sh '''
+                                echo "Initializing Terraform"
+                                terraform init
+                                terraform apply -auto-approve
+                            '''
+                        }
+
+                        // Validate and execute the Kubernetes setup script
+                        def script_path = "k8s/${stacking_folder}/${env_folder}/${env_folder}_k8s_setup.sh"
+                        echo "Checking for script at path: ${script_path}"
+
+                        sh """
+                            chmod +x "${script_path}"
+                            ${script_path} ${XAI_KEY}
+                        """
+                    }
+                }
+            }
 
 
+            
 
-    // stage('Destroy') {
-    //   agent { label 'build-node' }
-    //   steps {
-    //     dir('Terraform/Dev') {
-    //       sh ''' 
-    //         terraform destroy -auto-approve
-    //       '''
-    //     }
-    //   }
-    // }
+            // Add a Cleanup Stage Here
+            stage('logout') {
+                agent { label 'build-node' } // Specify your preferred agent here
+                steps {
+                sh '''
+                    docker logout
+                    docker system prune -f
+                '''
+                }
+            }
+
     }
         }
   
