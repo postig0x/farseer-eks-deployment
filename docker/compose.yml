@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ../farseer/backend
+      dockerfile: ../../docker/back.Dockerfile
+    container_name: backend
+    environment:
+      - XAI_KEY=${XAI_KEY}
+    ports:
+      - "8000:8000"
+    command: ["python3", "main.py"]
+    restart: unless-stopped
+    networks:
+      - testnet
+
+  frontend:
+    build:
+      context: ../farseer/frontend
+      dockerfile: ../../docker/front.Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    command: ["npm", "start"]
+    restart: unless-stopped
+    networks:
+      - testnet
+    depends_on:
+      - backend
+
+networks:
+  testnet:
+    driver: bridge

@@ -4,7 +4,7 @@ interface ErrorAnalysis {
 
 export async function simulateErrorAnalysis(logs: string): Promise<ErrorAnalysis> {
   try {
-    const response = await fetch('http://localhost:8000/api/log', {
+    const response = await fetch('/api/log', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

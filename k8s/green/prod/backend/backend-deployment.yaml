@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: cloudbandits/farseer_back:latest
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: XAI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: farseer-secret
+                  key: XAI_KEY
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 100m

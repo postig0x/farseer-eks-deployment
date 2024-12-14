@@ -1,11 +1,9 @@
 .DS_Store
 # Local .terraform directories
-**/.terraform/*
+*.terraform*
 
 # .tfstate files
-*.tfstate
-*.tfstate.*
+*.tfstate*
 
 #Ignore all .tfvars files 
-*.tfvars
-*.tfvars.json
+*.tfvars*
