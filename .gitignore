@@ -7,3 +7,7 @@
 
 #Ignore all .tfvars files 
 *.tfvars*
+
+# secrets
+**/secrets.yaml
+**/secrets.yml
