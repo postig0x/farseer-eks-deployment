@@ -22,8 +22,8 @@ class APIConfig:
         },
         APIProvider.DEEPSEEK: {
             "key_name": "DEEPSEEK_KEY",
-            "base_url": "https://api.openai.com/v1",
-            "model": "gpt-4o-mini",
+            "base_url": "https://api.deepseek.ai/v1",
+            "model": "deepseek-chat",
         },
     }
 
