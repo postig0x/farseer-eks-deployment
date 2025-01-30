@@ -4,7 +4,10 @@ import os
 import ell
 from openai import OpenAI
 from enum import Enum
-from typing import Dict
+from dotenv import load_dotenv
+
+if os.getenv('ENV') != 'production':
+    load_dotenv()
 
 class APIProvider(Enum):
     XAI = "xai"
@@ -19,9 +22,9 @@ class APIConfig:
         },
         APIProvider.DEEPSEEK: {
             "key_name": "DEEPSEEK_KEY",
-            "base_url": "https://api.deepseek.ai/v1",
-            "model": "deepseek-chat",
-        }
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4o-mini",
+        },
     }
 
     @staticmethod
