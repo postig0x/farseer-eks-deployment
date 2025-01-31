@@ -20,10 +20,14 @@ This project demonstrates the implementation of a secure, containerized applicat
     - Web UI for the backend service
     - Handles requests from users (browser)
 
+    ![Frontend](screenshots/frontend-demo.png)
+
 3. CLI Application (Rust)
     - Command-line interface for the backend service
     - Can use either local or remote backend services
     - Containerized (optional)
+
+    ![CLI](screenshots/cli-demo.png)
 
 ### Infrastructure
 
