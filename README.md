@@ -1,7 +1,5 @@
 # Farseer
 
-## Purpose
-
 Farseer is an agentic proof of concept designed for automated log analysis in cloud environments. The system leverages modern LLMs to provide intelligent parsing and analysis of various log types, including web server logs, system logs, application logs, and container logs.
 
 This project demonstrates the implementation of a secure, containerized application with Kubernetes integration, making it production-ready with a blue-green deployment strategy.
